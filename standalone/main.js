@@ -1,4 +1,3 @@
-window.onload = function() {
   var gCurrentFile,
       gProcessor;
 
@@ -11,4 +10,3 @@ window.onload = function() {
       filename = 'test.jscad';
 
   gProcessor.setJsCad( jscadscript, filename );
-};
