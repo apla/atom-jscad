@@ -736,6 +736,8 @@ OpenJsCad.Processor.prototype = {
     // surface/line draw
     this.controldiv = document.createElement("div");
     var this_ = this;
+
+    /*
     [['faces', 'surfaces', this.options.drawFaces],
      ['lines', 'lines', this.options.drawLines]].forEach(function(tup) {
         var cb = document.createElement('input');
@@ -748,6 +750,8 @@ OpenJsCad.Processor.prototype = {
         lb.appendChild(document.createTextNode(tup[1] + "  "));
         [cb, lb].forEach(function(ui) {this.controldiv.appendChild(ui)}, this);
     }, this);
+    */
+
     this.statusspan = document.createElement("span");
     this.statusbuttons = document.createElement("div");
     this.statusbuttons.style.float = "right";
