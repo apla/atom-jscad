@@ -101,7 +101,7 @@ OpenJsCad.Viewer.prototype = {
       var Renderer = this.webGLAvailable() && !bool_noWebGL ?
           THREE.WebGLRenderer : THREE.CanvasRenderer;
       // we're creating new canvas on switching renderer, as same
-      // canvas doesn't tolerate moving from webgl to canvasrenderer 
+      // canvas doesn't tolerate moving from webgl to canvasrenderer
       var renderer = new Renderer({precision: 'highp'});
       this.renderer_ = renderer;
 
@@ -319,7 +319,7 @@ OpenJsCad.runMainInWorker = function(mainParameters)
   catch(e)
   {
     var errtxt = e.toString();
-    if(e.stack) 
+    if(e.stack)
     {
       errtxt += '\nStack trace:\n'+e.stack;
     }
@@ -472,11 +472,9 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
 
 // callback: should be function(error, csg)
 OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, callback) {
-  var baselibraries = [
-    "csg.js",
-    "openjscad.js"
-  ];
 
+  var baselibraries = jsDependencies;
+  console.log( 'baselibraries', baselibraries );
   var baseurl = document.location.href.replace(/\?.*$/, '');
   var openjscadurl = baseurl;
   if (typeof options['openJsCadPath'] != 'undefined') {
@@ -505,9 +503,9 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   workerscript += "self.addEventListener('message', function(e) {if(e.data && e.data.cmd == 'render'){";
   workerscript += "  OpenJsCad.runMainInWorker("+JSON.stringify(mainParameters)+");";
   workerscript += "}},false);\n";
-    
+
   var blobURL = OpenJsCad.textToBlobUrl(workerscript);
-  
+
   if(!window.Worker) throw new Error("Your browser doesn't support Web Workers. Please try the Chrome browser instead.");
   var worker = new Worker(blobURL);
   worker.onmessage = function(e) {
@@ -706,7 +704,7 @@ OpenJsCad.Processor.prototype = {
   // e.g. setDrawOption('lines', false);
   setDrawOption: function(str, bool) {
     if (str == 'faces' || str == 'lines') {
-      this.viewer.drawOptions[str] = !!bool;      
+      this.viewer.drawOptions[str] = !!bool;
     }
     this.viewer.applyDrawOptions();
   },
@@ -722,7 +720,7 @@ OpenJsCad.Processor.prototype = {
     {
       this.containerdiv.removeChild(this.containerdiv.children[0]);
     }
-  
+
     var viewerdiv = document.createElement("div");
     viewerdiv.className = "viewer";
     this.containerdiv.appendChild(viewerdiv);
@@ -841,7 +839,7 @@ OpenJsCad.Processor.prototype = {
     }
     this.currentObjects=obj;
     while(this.renderedElementDropdown.options.length > 0) this.renderedElementDropdown.options.remove(0);
-    
+
     for(var i=0; i < obj.length; ++i)
     {
       var renderedelement = obj[i];
@@ -906,10 +904,10 @@ OpenJsCad.Processor.prototype = {
       this.viewer.clear();
       this.hasValidCurrentObject = false;
     }
-    
-    
+
+
   },
-  
+
   selectedFormat: function() {
     return this.formatDropdown.options[this.formatDropdown.selectedIndex].value;
   },
@@ -917,19 +915,19 @@ OpenJsCad.Processor.prototype = {
   selectedFormatInfo: function() {
     return this.formatInfo(this.selectedFormat());
   },
-  
+
   updateDownloadLink: function() {
     var ext = this.selectedFormatInfo().extension;
     this.generateOutputFileButton.innerHTML = "Generate "+ext.toUpperCase();
   },
-  
+
   clearViewer: function() {
     this.clearOutputFile();
     this.setRenderedObjects(null);
     this.hasValidCurrentObject = false;
     this.enableItems();
   },
-  
+
   abort: function() {
     if(this.processing)
     {
@@ -941,7 +939,7 @@ OpenJsCad.Processor.prototype = {
       if(this.onchange) this.onchange();
     }
   },
-  
+
   enableItems: function() {
     this.abortbutton.style.display = this.processing? "inline":"none";
     this.formatDropdown.style.display = ((!this.hasOutputFile)&&(this.hasValidCurrentObject))? "inline":"none";
@@ -962,17 +960,17 @@ OpenJsCad.Processor.prototype = {
     }
     this.options[ 'libraries' ].push( lib );
   },
-  
+
   setError: function(txt) {
     this.hasError = (txt != "");
     this.errorpre.textContent = txt;
     this.enableItems();
   },
-  
+
   setDebugging: function(debugging) {
     this.debugging = debugging;
   },
-  
+
   // script: javascript code
   // filename: optional, the name of the .jscad file
   setJsCad: function(script, filename) {
@@ -1008,7 +1006,7 @@ OpenJsCad.Processor.prototype = {
       if(this.onchange) this.onchange();
     }
   },
-  
+
   getParamValues: function()
   {
     var paramValues = {};
@@ -1054,7 +1052,7 @@ OpenJsCad.Processor.prototype = {
     }
     return paramValues;
   },
-    
+
   rebuildSolid: function()
   {
     this.abort();
@@ -1105,7 +1103,7 @@ OpenJsCad.Processor.prototype = {
       {
         that.processing = false;
         var errtxt = e.toString();
-        if(e.stack) 
+        if(e.stack)
         {
           errtxt += '\nStack trace:\n'+e.stack;
         }
@@ -1116,7 +1114,7 @@ OpenJsCad.Processor.prototype = {
       if(that.onchange) that.onchange();
     }
   },
-  
+
   hasSolid: function() {
     return this.hasValidCurrentObject;
   },
@@ -1124,7 +1122,7 @@ OpenJsCad.Processor.prototype = {
   isProcessing: function() {
     return this.processing;
   },
-   
+
   clearOutputFile: function() {
     if(this.hasOutputFile)
     {
@@ -1161,7 +1159,7 @@ OpenJsCad.Processor.prototype = {
 
   currentObjectToBlob: function() {
     var format = this.selectedFormat();
-    
+
     var blob;
     if(format == "stl")
     {
@@ -1180,7 +1178,7 @@ OpenJsCad.Processor.prototype = {
     }
     return blob;
   },
-  
+
   supportedFormatsForCurrentObject: function() {
     if (this.currentObject instanceof CSG) {
       return ["stl", "x3d"];
@@ -1190,7 +1188,7 @@ OpenJsCad.Processor.prototype = {
       throw new Error("Not supported");
     }
   },
-  
+
   formatInfo: function(format) {
     return {
       stl: {
@@ -1220,7 +1218,7 @@ OpenJsCad.Processor.prototype = {
     var blob = this.currentObjectToBlob();
     var windowURL=OpenJsCad.getWindowURL();
     this.outputFileBlobUrl = windowURL.createObjectURL(blob)
-    if(!this.outputFileBlobUrl) throw new Error("createObjectURL() failed"); 
+    if(!this.outputFileBlobUrl) throw new Error("createObjectURL() failed");
     this.hasOutputFile = true;
     this.downloadOutputFileLink.href = this.outputFileBlobUrl;
     this.downloadOutputFileLink.innerHTML = this.downloadLinkTextForCurrentObject();
@@ -1273,7 +1271,7 @@ OpenJsCad.Processor.prototype = {
       function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "requestFileSystem");}
     );
   },
-  
+
   createParamControls: function() {
     this.parameterstable.innerHTML = "";
     this.paramControls = [];
@@ -1408,7 +1406,7 @@ OpenJsCad.Processor.prototype = {
       {
         tr.style.display = (paramdef.visible) ? "table-row" : "none";
       }
-       
+
       td.innerHTML = label;
       tr.appendChild(td);
       td = document.createElement("td");
