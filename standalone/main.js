@@ -3,7 +3,7 @@ gProcessor;
 
 OpenJsCad.AlertUserOfUncaughtExceptions();
 
-gProcessor = new OpenJsCad.Processor(document.getElementById("viewer"));
+gProcessor = new OpenJsCad.Processor(document.getElementById("viewer-" + fileIdentifier));
 // gProcessor.setDebugging( true );
 
 /*
