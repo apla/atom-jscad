@@ -777,12 +777,16 @@ OpenJsCad.Processor.prototype = {
       that.currentFormat = that.formatDropdown.options[that.formatDropdown.selectedIndex].value;
       that.updateDownloadLink();
     };
-    this.statusbuttons.appendChild(this.formatDropdown);
+
+    // this.statusbuttons.appendChild(this.formatDropdown);
+
     this.generateOutputFileButton = document.createElement("button");
     this.generateOutputFileButton.onclick = function(e) {
       that.generateOutputFile();
     };
-    this.statusbuttons.appendChild(this.generateOutputFileButton);
+
+    // this.statusbuttons.appendChild(this.generateOutputFileButton);
+
     this.downloadOutputFileLink = document.createElement("a");
     this.statusbuttons.appendChild(this.downloadOutputFileLink);
     this.parametersdiv = document.createElement("div");
