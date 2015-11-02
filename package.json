@@ -8,7 +8,7 @@
   "activationCommands": {
     "atom-workspace": "atom-scad-preview:toggle"
   },
-  "repository": "https://github.com/atom/atom-scad-preview",
+  "repository": "https://github.com/matiasinsaurralde/atom-scad-preview",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
