@@ -473,8 +473,8 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
 // callback: should be function(error, csg)
 OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, callback) {
   var baselibraries = [
-    "src/csg.js",
-    "src/openjscad.js"
+    "csg.js",
+    "openjscad.js"
   ];
 
   var baseurl = document.location.href.replace(/\?.*$/, '');
