@@ -473,10 +473,12 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
 // callback: should be function(error, csg)
 OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, callback) {
 
-  var baselibraries = jsDependencies;
+  var baselibraries = [ jsDependencies[5], jsDependencies[7]  ];
   console.log( 'baselibraries', baselibraries );
   var baseurl = document.location.href.replace(/\?.*$/, '');
+  // var baseurl = 'file:///Users/matias/.atom/packages/atom-scad-preview';
   var openjscadurl = baseurl;
+
   if (typeof options['openJsCadPath'] != 'undefined') {
     // trailing '/' indicates it is a folder. This is necessary because makeAbsoluteUrl is called
     // on openjscadurl
