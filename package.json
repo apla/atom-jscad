@@ -1,7 +1,7 @@
 {
   "name": "atom-scad-preview",
   "main": "./lib/atom-scad-preview",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
