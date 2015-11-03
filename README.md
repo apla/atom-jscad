@@ -8,4 +8,4 @@ Experimental package available [here](https://atom.io/packages/atom-scad-preview
 
 ## TODO
 
-* Prepare package!
+* ~~Prepare package!~~
