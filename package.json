@@ -2,7 +2,7 @@
   "name": "atom-scad-preview",
   "main": "./lib/atom-scad-preview",
   "version": "0.0.3",
-  "description": "A short description of your package",
+  "description": "Previewing (j)scad inside Atom.",
   "keywords": [],
   "activationCommands": {
     "atom-workspace": "atom-scad-preview:toggle"
