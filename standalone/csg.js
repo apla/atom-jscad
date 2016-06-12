@@ -1,6 +1,6 @@
 /*
 
-## IMPORTANT NOTE --- IMPORTANT 
+## IMPORTANT NOTE --- IMPORTANT
 The master for this file is located at:
 https://github.com/joostn/openjscad/tree/gh-pages
 That is the gh-pages branch of the joostn/openjscad project
@@ -3997,7 +3997,7 @@ for solid CAD anyway.
     };
 
     // Get an orthonormal basis for the standard XYZ planes.
-    // Parameters: the names of two 3D axes. The 2d x axis will map to the first given 3D axis, the 2d y 
+    // Parameters: the names of two 3D axes. The 2d x axis will map to the first given 3D axis, the 2d y
     // axis will map to the second.
     // Prepend the axis with a "-" to invert the direction of this axis.
     // For example: CSG.OrthoNormalBasis.GetCartesian("-Y","Z")
@@ -5275,6 +5275,7 @@ for solid CAD anyway.
          http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
          */
         appendArc: function(endpoint, options) {
+            var decimals = 100000;
             if (arguments.length < 2) {
                 options = {};
             }
@@ -5302,6 +5303,10 @@ for solid CAD anyway.
             var largearc = CSG.parseOptionAsBool(options, "large", false);
             var startpoint = this.points[this.points.length - 1];
             endpoint = new CSG.Vector2D(endpoint);
+            // round to precision in order to have determinate calculations
+            xradius = Math.round(xradius*decimals)/decimals;
+            yradius = Math.round(yradius*decimals)/decimals;
+            endpoint = new CSG.Vector2D(Math.round(endpoint.x*decimals)/decimals,Math.round(endpoint.y*decimals)/decimals);
 
             var sweep_flag = !clockwise;
             var newpoints = [];
@@ -5319,7 +5324,10 @@ for solid CAD anyway.
                 var sinphi = Math.sin(phi);
                 var minushalfdistance = startpoint.minus(endpoint).times(0.5);
                 // F.6.5.1:
-                var start_translated = new CSG.Vector2D(cosphi * minushalfdistance.x + sinphi * minushalfdistance.y, -sinphi * minushalfdistance.x + cosphi * minushalfdistance.y);
+                // round to precision in order to have determinate calculations
+                var x = Math.round((cosphi * minushalfdistance.x + sinphi * minushalfdistance.y)*decimals)/decimals;
+                var y = Math.round((-sinphi * minushalfdistance.x + cosphi * minushalfdistance.y)*decimals)/decimals;
+                var start_translated = new CSG.Vector2D(x,y);
                 // F.6.6.2:
                 var biglambda = start_translated.x * start_translated.x / (xradius * xradius) + start_translated.y * start_translated.y / (yradius * yradius);
                 if (biglambda > 1) {
@@ -5327,6 +5335,9 @@ for solid CAD anyway.
                     var sqrtbiglambda = Math.sqrt(biglambda);
                     xradius *= sqrtbiglambda;
                     yradius *= sqrtbiglambda;
+                    // round to precision in order to have determinate calculations
+                    xradius = Math.round(xradius*decimals)/decimals;
+                    yradius = Math.round(yradius*decimals)/decimals;
                 }
                 // F.6.5.2:
                 var multiplier1 = Math.sqrt((xradius * xradius * yradius * yradius - xradius * xradius * start_translated.y * start_translated.y - yradius * yradius * start_translated.x * start_translated.x) / (xradius * xradius * start_translated.y * start_translated.y + yradius * yradius * start_translated.x * start_translated.x));
@@ -5743,7 +5754,7 @@ for solid CAD anyway.
         /*
          * given 2 connectors, this returns all polygons of a "wall" between 2
          * copies of this cag, positioned in 3d space as "bottom" and
-         * "top" plane per connectors toConnector1, and toConnector2, respectively 
+         * "top" plane per connectors toConnector1, and toConnector2, respectively
          */
         _toWallPolygons: function(options) {
             // normals are going to be correct as long as toConn2.point - toConn1.point
@@ -5993,12 +6004,12 @@ for solid CAD anyway.
             return result;
         },
 
-        // extrude the CAG in a certain plane. 
+        // extrude the CAG in a certain plane.
         // Giving just a plane is not enough, multiple different extrusions in the same plane would be possible
         // by rotating around the plane's origin. An additional right-hand vector should be specified as well,
         // and this is exactly a CSG.OrthoNormalBasis.
         // orthonormalbasis: characterizes the plane in which to extrude
-        // depth: thickness of the extruded shape. Extrusion is done from the plane towards above (unless 
+        // depth: thickness of the extruded shape. Extrusion is done from the plane towards above (unless
         // symmetrical option is set, see below)
         //
         // options:
