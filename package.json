@@ -7,6 +7,9 @@
   "activationCommands": {
     "atom-workspace": "atom-scad-preview:toggle"
   },
+  "scripts": {
+    "build-csg-three-js": "pushd standalone && cat three.min.js orbitcontrols.js projector.js canvasrenderer.js csg.js formats.js threecsg.js openjscad.js > openjscad-bundle.js && popd"
+  },
   "repository": "https://github.com/matiasinsaurralde/atom-scad-preview",
   "license": "MIT",
   "engines": {
