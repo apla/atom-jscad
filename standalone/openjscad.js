@@ -261,15 +261,20 @@ OpenJsCad.Viewer.prototype = {
         if (!hIsRatio) {
             this.canvas.style.height = this.size.height;
         }
+
         var widthInPx = this.canvas.clientWidth;
         var heightInPx = hIsRatio ?
             widthInPx * this.size.height :
             this.canvas.clientHeight;  // size.height.match(/^(\d+(?:\.\d+)?)(.*)$/)[1];
 
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        this.canvas.width = widthInPx * devicePixelRatio;
+        this.canvas.height = heightInPx * devicePixelRatio;
+
         this.camera_.aspect = widthInPx/heightInPx;
         this.camera_.updateProjectionMatrix();
         // set canvas attributes (false => don't set css)
-        this.renderer_.setSize(widthInPx, heightInPx, false);
+        this.renderer_.setSize(widthInPx * devicePixelRatio, heightInPx * devicePixelRatio, false);
         this.render();
     }
 };
