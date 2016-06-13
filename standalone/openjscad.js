@@ -34,7 +34,9 @@ OpenJsCad.Viewer = function(containerElm, size, options) {
       // Draw black triangle lines ("wireframe")
       lines: options.drawLines,
       // Draw surfaces
-      faces: options.drawFaces
+      faces: options.drawFaces,
+      // Draw grid
+      grid: options.drawGrid
     };
     // end config stuff
 
@@ -65,6 +67,9 @@ OpenJsCad.Viewer.prototype = {
       if (drawAxes) {
         this.drawAxes(axLen);
       }
+      if (this.drawOptions.grid) {
+        this.drawGrid();
+      }
     },
     createCamera: function() {
       var light = new THREE.PointLight();
@@ -75,6 +80,23 @@ OpenJsCad.Viewer.prototype = {
       camera.add(light);
       camera.up.set(0, 0, 1);
       this.scene_.add(camera);
+    },
+    drawGrid: function () {
+      var size = 200, step = 10;
+			var geometry = new THREE.Geometry();
+			for ( var i = - size; i <= size; i += step ) {
+				geometry.vertices.push( new THREE.Vector3( - size, i, 0 ) );
+				geometry.vertices.push( new THREE.Vector3(   size, i, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( i, - size, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( i,   size, 0 ) );
+			}
+			var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2, transparent: true } );
+			var line = THREE.LineSegments ? new THREE.LineSegments( geometry, material ) : new THREE.Line( geometry, material, THREE.LinePieces );
+			this.scene_.add( line );
+
+			var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+			var plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
+			this.scene_.add( plane );
     },
     createControls: function(canvas) {
       // controls. just change this line (and script include) to other threejs controls if desired
@@ -647,6 +669,8 @@ OpenJsCad.Processor = function(containerdiv, options, onchange) {
   this.options.drawLines = !!this.cleanOption(options.drawLines, false);
   // Draw surfaces
   this.options.drawFaces = !!this.cleanOption(options.drawFaces, true);
+  // Draw grid
+  this.options.drawGrid = !!this.cleanOption(options.drawGrid, true);
   // verbose output
   this.options.verbose = !!this.cleanOption(options.verbose, true);
 
@@ -703,7 +727,7 @@ OpenJsCad.Processor.prototype = {
   },
   // pass "faces" or "lines"
   toggleDrawOption: function(str) {
-    if (str == 'faces' || str == 'lines') {
+    if (str == 'faces' || str == 'lines' || str == 'grid') {
       var newState = !this.viewer.drawOptions[str];
       this.setDrawOption(str, newState);
       return newState;
