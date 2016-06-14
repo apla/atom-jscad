@@ -1,9 +1,15 @@
 {
   "name": "atom-scad-preview",
   "main": "./lib/atom-scad-preview",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Previewing (j)scad inside Atom.",
-  "keywords": [ "scad", "jscad", "3d", "cad", "threejs" ],
+  "keywords": [
+    "scad",
+    "jscad",
+    "3d",
+    "cad",
+    "threejs"
+  ],
   "activationCommands": {
     "atom-workspace": "atom-scad-preview:toggle"
   },
