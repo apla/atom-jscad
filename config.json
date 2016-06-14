@@ -1,0 +1,30 @@
+{
+	"drawLines": {
+		"title": "Draw lines",
+		"description": "Draw black triangle lines ('wireframe')",
+		"type": "boolean",
+		"default": false
+	},
+	"drawFaces": {
+		"title": "Draw faces",
+		"description": "Draw surface",
+		"type": "boolean",
+		"default": true
+	},
+	"drawGrid": {
+		"title": "Draw grid",
+		"description": "Draw XY grid 200x200",
+		"type": "boolean",
+		"default": true
+	},
+	"color": {
+		"title": "Default model color",
+		"type": "color",
+		"default": "#0000ff"
+	},
+	"backgroundColor": {
+		"title": "Background color",
+		"type": "color",
+		"default": "#eee"
+	}
+}
