@@ -18,7 +18,7 @@ Go to the atom packages location (`~/.atom/packages/`), then
 
 ## TODO
 
-Current version (branch openjscad-org)
+Current version
 
 * [ ] Bring back export
 * [ ] Port includes support from .org
@@ -35,7 +35,7 @@ Current version (branch openjscad-org)
     * [ ] Backport changes to the [joostn](https://github.com/joostn/OpenJsCad/tree/gh-pages) and [Spiritdude](https://github.com/Spiritdude/OpenJSCAD.org/tree/dev) branches
 * [x] Make viewer HiDPI compatible ([WebGL HiDPI](https://www.khronos.org/webgl/wiki/HandlingHighDPI))
 
-Current version (branch master)
+v0.1.0
 
 * [x] Make it work again with CSP
 
