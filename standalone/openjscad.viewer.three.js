@@ -210,8 +210,12 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     }, this);
     this.render();
   },
-  setCsg: function(csg, resetZoom) {
+  setCsg: function(csg) {
     this.clear();
+
+    // set resetZoom on first render
+    var resetZoom = !this.resetZoom_;
+    this.resetZoom_ = resetZoom;
 
     var faceColor = this.options.solid.faceColor;
 
