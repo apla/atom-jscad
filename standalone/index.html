@@ -1,22 +1,76 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <script src="three.min.js"></script>
-  <script src="orbitcontrols.js"></script>
-  <script src="projector.js"></script>
-  <script src="canvasrenderer.js"></script>
-  <script src="jquery-2.1.3.min.js"></script>
-  <script src="csg.js"></script>
-  <script src="threecsg.js"></script>
-  <script src="openjscad.js"></script>
-  <script src="formats.js"></script>
-  <title></title>
-</head>
-<body>
-  <div id="viewer">
-  </div>
+  <head>
+    <meta charset="utf-8">
+    <script src="three.min.js"></script>
+    <script src="orbitcontrols.js"></script>
+    <script src="projector.js"></script>
+    <script src="canvasrenderer.js"></script>
+    <script src="jquery-2.1.3.min.js"></script>
+    <script src="csg.js"></script>
+    <script src="threecsg.js"></script>
+    <script src="org/openjscad.js"></script>
+    <script src="org/jscad-function.js"></script>
+    <script src="openjscad.viewer.js"></script>
+    <script src="openjscad.viewer.three.js"></script>
+    <script src="lightgl.js"></script>
+    <script src="jquery.hammer.js"></script>
 
-  <script src="main.js"></script>
-</body>
+    <script src="openjscad.viewer.lightgl.js"></script>
+    <script src="formats.js"></script>
+    <script src="../test.js"></script>
+    <title></title>
+  </head>
+  <body>
+    <div style="display: flex;">
+      <div style="flex: 1; height: 75vh">
+        <div>THREE.js</div>
+        <div id="viewer-1"></div>
+      </div>
+      <div style="flex: 1; height: 75vh">
+        <div>lightgl.js</div>
+        <div id="viewer-2"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var gCurrentFile,
+          gProcessor;
+
+      OpenJsCad.AlertUserOfUncaughtExceptions();
+
+      OpenJsCad.workerDeps = [
+        'csg.js', 'openjscad.js', 'openscad.js'
+      ];
+
+      gProcessor = new OpenJsCad.Processor(
+        document.getElementById("viewer-1"),
+        {
+          "engine": "ThreeEngine",
+          "solid": {
+            "color": "rgba(129, 211, 45, 1)"
+          }
+        }
+      );
+      // gProcessor.setDebugging( true );
+
+
+      var jscadscript = 'function main() { var cube = CSG.roundedCube({radius: 10, roundradius: 2, resolution: 16}); var sphere = CSG.sphere({radius: 10, resolution: 16}).translate([5, 5, 5]); return cube.union(sphere); }',
+          filename = 'test.jscad';
+
+      gProcessor.setJsCad( jscadscript, 'test.jscad' );
+
+      var gProcessor2 = new OpenJsCad.Processor(
+        document.getElementById("viewer-2"),
+        {
+          "engine": "LightJSEngine",
+          "solid": {
+            "color": "rgba(129, 211, 45, 1)"
+          }
+        }
+      );
+
+      gProcessor2.setJsCad( jscadscript, 'test.jscad' );
+    </script>
+  </body>
 </html>
