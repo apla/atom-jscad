@@ -1,8 +1,8 @@
-# atom-scad-preview (alpha?)
+# atom-scad-preview
 
-Previewing (j)scad inside Atom :)
+Solid 3D CAD models inside Atom (JSCAD).
 
-![A screenshot of your package](https://raw.githubusercontent.com/matiasinsaurralde/atom-scad-preview/master/screenshot.jpg)
+![Screenshot](https://raw.githubusercontent.com/matiasinsaurralde/atom-scad-preview/master/screenshot.jpg)
 
 Experimental package available [here](https://atom.io/packages/atom-scad-preview).
 
