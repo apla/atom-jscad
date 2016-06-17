@@ -5,6 +5,36 @@
 @import "ui-variables";
 
 .atom-scad-preview {
+  .statusdiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  .parametersdiv {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(192,192,192,.5);
+    padding: 5px;
+    border-radius: 5px;
+
+    button {
+      float: right;
+    }
+  }
+  .parameterstable {
+    min-width: 200px;
+    max-height: 100px;
+    overflow: auto;
+    display: block;
+
+    margin: .5em 0;
+
+    td {
+      padding-right: 1em;
+    }
+  }
 }
 
 .statusdiv {

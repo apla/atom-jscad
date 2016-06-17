@@ -208,7 +208,8 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
     workerscript += "debugger;\n";
   }
   workerscript += "return main("+JSON.stringify(mainParameters)+");";
-  var f = new Function(workerscript);
+  var Fn = OpenJsCad.Function || Function;
+  var f = new Fn(workerscript);
   OpenJsCad.log.prevLogTime = Date.now();
   var result = f();
   result=OpenJsCad.expandResultObjectArray(result);
@@ -343,11 +344,12 @@ OpenJsCad.AlertUserOfUncaughtExceptions = function() {
 // parse the jscad script to get the parameter definitions
 OpenJsCad.getParamDefinitions = function(script) {
   var scriptisvalid = true;
+  var Fn = OpenJsCad.Function || Function;
   try
   {
     // first try to execute the script itself
     // this will catch any syntax errors
-    var f = new Function(script);
+    var f = new Fn(script);
     f();
   }
   catch(e) {
@@ -358,7 +360,7 @@ OpenJsCad.getParamDefinitions = function(script) {
   {
     var script1 = "if(typeof(getParameterDefinitions) == 'function') {return getParameterDefinitions();} else {return [];} ";
     script1 += script;
-    var f = new Function(script1);
+    var f = new Fn(script1);
     params = f();
     if( (typeof(params) != "object") || (typeof(params.length) != "number") )
     {

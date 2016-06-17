@@ -16,23 +16,33 @@ Go to the atom packages location (`~/.atom/packages/`), then
 * `cd atom-scad-preview`
 * `git checkout openjscad-org`
 
-## TODO
+## WIP
 
-Current version
-
+ * [ ] Keep parameter state/zoom/camera position between source updates
  * [ ] Bring back export
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
- * [ ] Check parameters
- * [x] Allow selection of renderer backend
  * [ ] Shift-LMB to pan (Atom have it's own idea about right clicks)
- * [x] **EPIC** merge joostn and Spiritdude histories
+ * [ ] **EPIC** merge joostn and Spiritdude histories
+   * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
+   * [ ] processor
+
+## CHANGELOG
+
+v0.3.0
+
+ * [x] Parameters support
+ * [x] Maximized preview area
+
+v0.2.0
+
+ * [x] Allow selection of renderer backend
  * [x] Automatically switch to the preview for active editor pane
  * [x] Handle pane resize (works mostly, Atom doesn't have panel add event)
  * [x] Display grid in XY plane
-   * [x] Backport changes to the [joostn](https://github.com/joostn/OpenJsCad/tree/gh-pages) and [Spiritdude](https://github.com/Spiritdude/OpenJSCAD.org/tree/dev) branches ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
+   * [x] Backport changes to the [joostn](https://github.com/joostn/OpenJsCad/tree/gh-pages) and [Spiritdude](https://github.com/Spiritdude/OpenJSCAD.org/tree/dev) branches
  * [x] Add configuration options (colors, display axis, triangles, grid)
-   * [x] Backport changes to the [joostn](https://github.com/joostn/OpenJsCad/tree/gh-pages) and [Spiritdude](https://github.com/Spiritdude/OpenJSCAD.org/tree/dev) branches ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
+   * [x] Backport changes to the [joostn](https://github.com/joostn/OpenJsCad/tree/gh-pages) and [Spiritdude](https://github.com/Spiritdude/OpenJSCAD.org/tree/dev) branches
  * [x] Make viewer HiDPI compatible ([WebGL HiDPI](https://www.khronos.org/webgl/wiki/HandlingHighDPI))
 
 v0.1.0
