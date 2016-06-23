@@ -529,14 +529,14 @@ OpenJsCad.Processor.prototype = {
       that.updateDownloadLink();
     };
 
-    // this.statusbuttons.appendChild(this.formatDropdown);
+    this.statusbuttons.appendChild(this.formatDropdown);
 
     this.generateOutputFileButton = document.createElement("button");
     this.generateOutputFileButton.onclick = function(e) {
       that.generateOutputFile();
     };
 
-    // this.statusbuttons.appendChild(this.generateOutputFileButton);
+    this.statusbuttons.appendChild(this.generateOutputFileButton);
 
     this.downloadOutputFileLink = document.createElement("a");
     this.statusbuttons.appendChild(this.downloadOutputFileLink);
