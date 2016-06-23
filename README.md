@@ -18,8 +18,7 @@ Go to the atom packages location (`~/.atom/packages/`), then
 
 ## WIP
 
- * [ ] Keep parameter state/zoom/camera position between source updates
- * [ ] Bring back export
+ * [ ] Retain parameter state on source save
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
  * [ ] Shift-LMB to pan (Atom have it's own idea about right clicks)
@@ -31,6 +30,8 @@ Go to the atom packages location (`~/.atom/packages/`), then
 
 v0.3.0
 
+ * [x] Bring back export
+ * [x] Keep parameter state/zoom/camera position between source updates
  * [x] Parameters support
  * [x] Maximized preview area
 
