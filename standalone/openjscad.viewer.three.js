@@ -214,8 +214,8 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     this.clear();
 
     // set resetZoom on first render
-    var resetZoom = !this.resetZoom_;
-    this.resetZoom_ = resetZoom;
+    var resetZoom = this.resetZoom_ ? false : true;
+    this.resetZoom_ = true;
 
     var faceColor = this.options.solid.faceColor;
 
