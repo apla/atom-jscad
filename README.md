@@ -18,9 +18,11 @@ Go to the atom packages location (`~/.atom/packages/`), then
 
 ## WIP
 
+ * [ ] Human-centric scad => jscad conversion
  * [ ] Retain parameter state on source save
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
+   * [ ] Watch includes for changes and reload
  * [ ] Shift-LMB to pan (Atom have it's own idea about right clicks)
  * [ ] **EPIC** merge joostn and Spiritdude histories
    * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
