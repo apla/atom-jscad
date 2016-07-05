@@ -23,12 +23,20 @@ Go to the atom packages location (`~/.atom/packages/`), then
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
    * [ ] Watch includes for changes and reload
- * [ ] Shift-LMB to pan (Atom have it's own idea about right clicks)
  * [ ] **EPIC** merge joostn and Spiritdude histories
    * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
    * [ ] processor
 
 ## CHANGELOG
+
+v0.5.0
+
+ * [ ] Right click and drag to pan (It is easier to handle right click than a shift key)
+
+
+v0.4.0
+
+Patch release tagged as minor
 
 v0.3.0
 
