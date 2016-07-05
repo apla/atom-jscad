@@ -1,9 +1,27 @@
 # See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
 'context-menu':
-  'atom-text-editor': [
+  'atom-pane[data-active-item-name$=\\.jscad] atom-text-editor': [
     {
-      'label': 'Toggle atom-scad-preview'
+      'label': 'Preview JSCAD'
       'command': 'atom-scad-preview:toggle'
+    }
+  ]
+  'atom-pane[data-active-item-name$=\\.scad] atom-text-editor': [
+    {
+      'label': 'Preview SCAD'
+      'command': 'atom-scad-preview:toggle'
+    }
+  ]
+  '.tree-view .file .name[data-name$=\\.jscad]': [
+    {
+      'label': 'Preview JSCAD'
+      'command':  'atom-scad-preview:toggle'
+    }
+  ]
+  '.tree-view .file .name[data-name$=\\.scad]': [
+    {
+      'label': 'Preview SCAD'
+      'command':  'atom-scad-preview:toggle'
     }
   ]
 'menu': [
