@@ -277,8 +277,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
     }
   };
   worker.onerror = function(e) {
-    var errtxt = "Error in line "+e.lineno+": "+e.message;
-    callback(errtxt, null);
+    callback(e, null);
   };
   worker.postMessage({
     cmd: "render"
@@ -722,9 +721,10 @@ OpenJsCad.Processor.prototype = {
     this.options[ 'libraries' ].push( lib );
   },
 
-  setError: function(txt) {
+  setError: function(txt, err) {
     this.hasError = (txt != "");
     this.errorpre.textContent = txt;
+    this.errorObject = err;
     this.enableItems();
   },
 
@@ -751,7 +751,7 @@ OpenJsCad.Processor.prototype = {
     }
     catch(e)
     {
-      this.setError(e.toString());
+      this.setError(e.toString(), e);
       this.statusspan.innerHTML = "Error.";
       scripthaserrors = true;
     }
@@ -834,9 +834,11 @@ OpenJsCad.Processor.prototype = {
         that.processing = false;
         that.worker.terminate();
         that.worker = null;
+
         if(err)
         {
-          that.setError(err);
+          var errtxt = "Error in line "+err.lineno+": "+err.message;
+          that.setError(errtxt, err);
           that.statusspan.innerHTML = "Error.";
         }
         else
@@ -868,7 +870,7 @@ OpenJsCad.Processor.prototype = {
         {
           errtxt += '\nStack trace:\n'+e.stack;
         }
-        that.setError(errtxt);
+        that.setError (errtxt, e);
         that.statusspan.innerHTML = "Error.";
       }
       that.enableItems();

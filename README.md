@@ -23,15 +23,25 @@ Go to the atom packages location (`~/.atom/packages/`), then
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
    * [ ] Watch includes for changes and reload
+   * [ ] Jump to the error source in included file
  * [ ] **EPIC** merge joostn and Spiritdude histories
    * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
    * [ ] processor
 
+ * [ ] Display error after pane rendering
+ * [ ] Render file contents for unsaved file
+
 ## CHANGELOG
+
+v0.6.0
+
+ * [x] Show jscad compilation errors
+ * [x] Jump to the error source in main file
+ * [x] Hide previous error on save
 
 v0.5.0
 
- * [ ] Right click and drag to pan (It is easier to handle right click than a shift key)
+ * [x] Right click and drag to pan (It is easier to handle right click than a shift key)
 
 
 v0.4.0
