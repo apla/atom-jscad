@@ -29,9 +29,12 @@ Go to the atom packages location (`~/.atom/packages/`), then
    * [ ] processor
 
  * [ ] Display error after pane rendering
- * [ ] Render file contents for unsaved file
 
 ## CHANGELOG
+
+v0.6.1
+
+ * [x] Do not render file contents of unsaved file
 
 v0.6.0
 
