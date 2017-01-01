@@ -1,30 +1,27 @@
-var OpenJsCad = function() {
-};
+var OpenJsCad = function () {};
 
-OpenJsCad.log = function(txt) {
+OpenJsCad.log = function (txt) {
   var timeInMs = Date.now();
   var prevtime = OpenJsCad.log.prevLogTime;
-  if(!prevtime) prevtime = timeInMs;
+  if (!prevtime) prevtime = timeInMs;
   var deltatime = timeInMs - prevtime;
   OpenJsCad.log.prevLogTime = timeInMs;
-  var timefmt = (deltatime*0.001).toFixed(3);
-  txt = "["+timefmt+"] "+txt;
-  if( (typeof(console) == "object") && (typeof(console.log) == "function") )
-  {
+  var timefmt = (deltatime * 0.001).toFixed(3);
+  txt = "[" + timefmt + "] " + txt;
+  if ((typeof (console) == "object") && (typeof (console.log) == "function")) {
     console.log(txt);
-  }
-  else if( (typeof(self) == "object") && (typeof(self.postMessage) == "function") )
-  {
-    self.postMessage({cmd: 'log', txt: txt});
-  }
-  else throw new Error("Cannot log");
+  } else if ((typeof (self) == "object") && (typeof (self.postMessage) == "function")) {
+    self.postMessage({
+      cmd: 'log',
+      txt: txt
+    });
+  } else throw new Error("Cannot log");
 };
 
 // make a full url path out of a base path and url component.
 // url argument is interpreted as a folder name if it ends with a slash
-OpenJsCad.makeAbsoluteUrl = function(url, baseurl) {
-  if(!url.match(/^[a-z]+\:/i))
-  {
+OpenJsCad.makeAbsoluteUrl = function (url, baseurl) {
+  if (!url.match(/^[a-z]+\:/i)) {
     var re = /^\/|\/$/g;
     if (baseurl[baseurl.length - 1] != '/') {
       // trailing part is a file, not part of base - remove
@@ -33,8 +30,7 @@ OpenJsCad.makeAbsoluteUrl = function(url, baseurl) {
     if (url[0] == '/') {
       var basecomps = baseurl.split('/');
       url = basecomps[0] + '//' + basecomps[2] + '/' + url.replace(re, "");
-    }
-    else {
+    } else {
       url = (baseurl.replace(re, "") + '/' + url.replace(re, ""))
         .replace(/[^\/]+\/\.\.\//g, "");
     }
@@ -42,162 +38,130 @@ OpenJsCad.makeAbsoluteUrl = function(url, baseurl) {
   return url;
 };
 
-OpenJsCad.isChrome = function()
-{
+OpenJsCad.isChrome = function () {
   return (navigator.userAgent.search("Chrome") >= 0);
 };
 
 // This is called from within the web worker. Execute the main() function of the supplied script
 // and post a message to the calling thread when finished
-OpenJsCad.runMainInWorker = function(mainParameters)
-{
-  try
-  {
-    if(typeof(main) != 'function') throw new Error('Your jscad file should contain a function main() which returns a CSG solid or a CAG area.');
+OpenJsCad.runMainInWorker = function (mainParameters) {
+  try {
+    if (typeof (main) != 'function') throw new Error('Your jscad file should contain a function main() which returns a CSG solid or a CAG area.');
     OpenJsCad.log.prevLogTime = Date.now();
     var result = main(mainParameters);
-    result=OpenJsCad.expandResultObjectArray(result);
+    result = OpenJsCad.expandResultObjectArray(result);
     OpenJsCad.checkResult(result);
     var result_compact = OpenJsCad.resultToCompactBinary(result);
     result = null; // not needed anymore
-    self.postMessage({cmd: 'rendered', result: result_compact});
-  }
-  catch(e)
-  {
+    self.postMessage({
+      cmd: 'rendered',
+      result: result_compact
+    });
+  } catch (e) {
     var errtxt = e.toString();
-    if(e.stack)
-    {
-      errtxt += '\nStack trace:\n'+e.stack;
+    if (e.stack) {
+      errtxt += '\nStack trace:\n' + e.stack;
     }
-    self.postMessage({cmd: 'error', err: errtxt});
+    self.postMessage({
+      cmd: 'error',
+      err: errtxt
+    });
   }
 };
 
 // expand an array of CSG or CAG objects into an array of objects [{data: <CAG or CSG object>}]
-OpenJsCad.expandResultObjectArray = function(result) {
-    if(result instanceof Array)
-    {
-        result=result.map(function(resultelement){
-            if( (resultelement instanceof CSG) || (resultelement instanceof CAG) )
-            {
-                resultelement = {data: resultelement};
-            }
-            return resultelement;
-        });
-    }
-    return result;
+OpenJsCad.expandResultObjectArray = function (result) {
+  if (result instanceof Array) {
+    result = result.map(function (resultelement) {
+      if ((resultelement instanceof CSG) || (resultelement instanceof CAG)) {
+        resultelement = {
+          data: resultelement
+        };
+      }
+      return resultelement;
+    });
+  }
+  return result;
 };
 
 // check whether the supplied script returns valid object(s)
-OpenJsCad.checkResult = function(result) {
-  var ok=true;
-  if(typeof(result) != "object")
-  {
-    ok=false;
-  }
-  else
-  {
-    if(result instanceof Array)
-    {
-      if(result.length < 1)
-      {
-        ok=false;
-      }
-      else
-      {
-        result.forEach(function(resultelement){
-          if(! ("data" in resultelement))
-          {
-            ok=false;
-          }
-          else
-          {
-            if( (resultelement.data instanceof CSG) || (resultelement.data instanceof CAG) )
-            {
+OpenJsCad.checkResult = function (result) {
+  var ok = true;
+  if (typeof (result) != "object") {
+    ok = false;
+  } else {
+    if (result instanceof Array) {
+      if (result.length < 1) {
+        ok = false;
+      } else {
+        result.forEach(function (resultelement) {
+          if (!("data" in resultelement)) {
+            ok = false;
+          } else {
+            if ((resultelement.data instanceof CSG) || (resultelement.data instanceof CAG)) {
               // ok
-            }
-            else
-            {
-              ok=false;
+            } else {
+              ok = false;
             }
           }
         });
       }
 
-    }
-    else if( (result instanceof CSG) || (result instanceof CAG) )
-    {
-    }
-    else
-    {
-      ok=false;
+    } else if ((result instanceof CSG) || (result instanceof CAG)) {} else {
+      ok = false;
     }
   }
-  if(!ok)
-  {
+  if (!ok) {
     throw new Error("Your main() function does not return valid data. It should return one of the following: a CSG object, a CAG object, an array of CSG/CAG objects, or an array of objects: [{name:, caption:, data:}, ...] where data contains a CSG or CAG object.");
   }
 };
 
 // convert the result to a compact binary representation, to be copied from the webworker to the main thread.
 // it is assumed that checkResult() has been called already so the data is valid.
-OpenJsCad.resultToCompactBinary = function(resultin) {
+OpenJsCad.resultToCompactBinary = function (resultin) {
   var resultout;
-  if(resultin instanceof Array)
-  {
-    resultout=resultin.map(function(resultelement){
-      var r=resultelement;
-      r.data=resultelement.data.toCompactBinary();
+  if (resultin instanceof Array) {
+    resultout = resultin.map(function (resultelement) {
+      var r = resultelement;
+      r.data = resultelement.data.toCompactBinary();
       return r;
     });
-  }
-  else
-  {
-    resultout=resultin.toCompactBinary();
+  } else {
+    resultout = resultin.toCompactBinary();
   }
   return resultout;
 };
 
-OpenJsCad.resultFromCompactBinary = function(resultin) {
-  function fromCompactBinary(r)
-  {
+OpenJsCad.resultFromCompactBinary = function (resultin) {
+  function fromCompactBinary(r) {
     var result;
-    if(r.class == "CSG")
-    {
-      result=CSG.fromCompactBinary(r);
-    }
-    else if(r.class == "CAG")
-    {
-      result=CAG.fromCompactBinary(r);
-    }
-    else
-    {
+    if (r.class == "CSG") {
+      result = CSG.fromCompactBinary(r);
+    } else if (r.class == "CAG") {
+      result = CAG.fromCompactBinary(r);
+    } else {
       throw new Error("Cannot parse result");
     }
     return result;
   }
   var resultout;
-  if(resultin instanceof Array)
-  {
-    resultout=resultin.map(function(resultelement){
-      var r=resultelement;
-      r.data=fromCompactBinary(resultelement.data);
+  if (resultin instanceof Array) {
+    resultout = resultin.map(function (resultelement) {
+      var r = resultelement;
+      r.data = fromCompactBinary(resultelement.data);
       return r;
     });
-  }
-  else
-  {
-    resultout=fromCompactBinary(resultin);
+  } else {
+    resultout = fromCompactBinary(resultin);
   }
   return resultout;
 };
 
 
-OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
+OpenJsCad.parseJsCadScriptSync = function (script, mainParameters, debugging) {
   var workerscript = "";
   workerscript += script;
-  if(debugging)
-  {
+  if (debugging) {
     workerscript += "\n\n\n\n\n\n\n/* -------------------------------------------------------------------------\n";
     workerscript += "OpenJsCad debugging\n\nAssuming you are running Chrome:\nF10 steps over an instruction\nF11 steps into an instruction\n";
     workerscript += "F8  continues running\nPress the (||) button at the bottom to enable pausing whenever an error occurs\n";
@@ -207,21 +171,21 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
     workerscript += "\n\n// Now press F11 twice to enter your main() function:\n\n";
     workerscript += "debugger;\n";
   }
-  workerscript += "return main("+JSON.stringify(mainParameters)+");";
+  workerscript += "return main(" + JSON.stringify(mainParameters) + ");";
   var Fn = OpenJsCad.Function || Function;
   var f = new Fn(workerscript);
   OpenJsCad.log.prevLogTime = Date.now();
   var result = f();
-  result=OpenJsCad.expandResultObjectArray(result);
+  result = OpenJsCad.expandResultObjectArray(result);
   OpenJsCad.checkResult(result);
   return result;
 };
 
 // callback: should be function(error, csg)
-OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, callback) {
+OpenJsCad.parseJsCadScriptASync = function (script, mainParameters, options, callback) {
 
-  var baselibraries = OpenJsCad.workerDeps || [ jsDependencies[5], jsDependencies[7]  ];
-  console.log( 'baselibraries', baselibraries );
+  var baselibraries = OpenJsCad.workerDeps || [jsDependencies[5], jsDependencies[7]];
+  // console.log( 'baselibraries', baselibraries );
   var baseurl = document.location.href.replace(/\?.*$/, '');
   // var baseurl = 'file:///Users/matias/.atom/packages/atom-scad-preview';
   var openjscadurl = baseurl;
@@ -229,7 +193,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   if (typeof options['openJsCadPath'] != 'undefined') {
     // trailing '/' indicates it is a folder. This is necessary because makeAbsoluteUrl is called
     // on openjscadurl
-    openjscadurl = OpenJsCad.makeAbsoluteUrl( options['openJsCadPath'], baseurl ) + '/';
+    openjscadurl = OpenJsCad.makeAbsoluteUrl(options['openJsCadPath'], baseurl) + '/';
   }
 
   var libraries = [];
@@ -240,43 +204,37 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   var workerscript = "";
   workerscript += script;
   workerscript += "\n\n\n\n//// The following code is added by OpenJsCad:\n";
-  workerscript += "var _csg_baselibraries=" + JSON.stringify(baselibraries)+";\n";
-  workerscript += "var _csg_libraries=" + JSON.stringify(libraries)+";\n";
-  workerscript += "var _csg_baseurl=" + JSON.stringify(baseurl)+";\n";
-  workerscript += "var _csg_openjscadurl=" + JSON.stringify(openjscadurl)+";\n";
-  workerscript += "var _csg_makeAbsoluteURL=" + OpenJsCad.makeAbsoluteUrl.toString()+";\n";
+  workerscript += "var _csg_baselibraries=" + JSON.stringify(baselibraries) + ";\n";
+  workerscript += "var _csg_libraries=" + JSON.stringify(libraries) + ";\n";
+  workerscript += "var _csg_baseurl=" + JSON.stringify(baseurl) + ";\n";
+  workerscript += "var _csg_openjscadurl=" + JSON.stringify(openjscadurl) + ";\n";
+  workerscript += "var _csg_makeAbsoluteURL=" + OpenJsCad.makeAbsoluteUrl.toString() + ";\n";
   workerscript += "_csg_baselibraries = _csg_baselibraries.map(function(l){return _csg_makeAbsoluteURL(l,_csg_openjscadurl);});\n";
   workerscript += "_csg_libraries = _csg_libraries.map(function(l){return _csg_makeAbsoluteURL(l,_csg_baseurl);});\n";
   workerscript += "_csg_baselibraries.map(function(l){importScripts(l)});\n";
   workerscript += "_csg_libraries.map(function(l){importScripts(l)});\n";
   workerscript += "self.addEventListener('message', function(e) {if(e.data && e.data.cmd == 'render'){";
-  workerscript += "  OpenJsCad.runMainInWorker("+JSON.stringify(mainParameters)+");";
+  workerscript += "  OpenJsCad.runMainInWorker(" + JSON.stringify(mainParameters) + ");";
   workerscript += "}},false);\n";
 
   var blobURL = OpenJsCad.textToBlobUrl(workerscript);
 
-  if(!window.Worker) throw new Error("Your browser doesn't support Web Workers. Please try the Chrome browser instead.");
+  if (!window.Worker) throw new Error("Your browser doesn't support Web Workers. Please try the Chrome browser instead.");
   var worker = new Worker(blobURL);
-  worker.onmessage = function(e) {
-    if(e.data)
-    {
-      if(e.data.cmd == 'rendered')
-      {
+  worker.onmessage = function (e) {
+    if (e.data) {
+      if (e.data.cmd == 'rendered') {
         var resulttype = e.data.result.class;
         var result = OpenJsCad.resultFromCompactBinary(e.data.result);
         callback(null, result);
-      }
-      else if(e.data.cmd == "error")
-      {
+      } else if (e.data.cmd == "error") {
         callback(e.data.err, null);
-      }
-      else if(e.data.cmd == "log")
-      {
+      } else if (e.data.cmd == "log") {
         console.log(e.data.txt);
       }
     }
   };
-  worker.onerror = function(e) {
+  worker.onerror = function (e) {
     callback(e, null);
   };
   worker.postMessage({
@@ -285,27 +243,29 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   return worker;
 };
 
-OpenJsCad.getWindowURL = function() {
-  if(window.URL) return window.URL;
-  else if(window.webkitURL) return window.webkitURL;
+OpenJsCad.getWindowURL = function () {
+  if (window.URL) return window.URL;
+  else if (window.webkitURL) return window.webkitURL;
   else throw new Error("Your browser doesn't support window.URL");
 };
 
-OpenJsCad.textToBlobUrl = function(txt) {
-  var windowURL=OpenJsCad.getWindowURL();
-  var blob = new Blob([txt], {type : 'application/javascript'});
+OpenJsCad.textToBlobUrl = function (txt) {
+  var windowURL = OpenJsCad.getWindowURL();
+  var blob = new Blob([txt], {
+    type: 'application/javascript'
+  });
   var blobURL = windowURL.createObjectURL(blob);
-  if(!blobURL) throw new Error("createObjectURL() failed");
+  if (!blobURL) throw new Error("createObjectURL() failed");
   return blobURL;
 };
 
-OpenJsCad.revokeBlobUrl = function(url) {
-  if(window.URL) window.URL.revokeObjectURL(url);
-  else if(window.webkitURL) window.webkitURL.revokeObjectURL(url);
+OpenJsCad.revokeBlobUrl = function (url) {
+  if (window.URL) window.URL.revokeObjectURL(url);
+  else if (window.webkitURL) window.webkitURL.revokeObjectURL(url);
   else throw new Error("Your browser doesn't support window.URL");
 };
 
-OpenJsCad.FileSystemApiErrorHandler = function(fileError, operation) {
+OpenJsCad.FileSystemApiErrorHandler = function (fileError, operation) {
   var errormap = {
     1: 'NOT_FOUND_ERR',
     2: 'SECURITY_ERR',
@@ -321,48 +281,41 @@ OpenJsCad.FileSystemApiErrorHandler = function(fileError, operation) {
     12: 'PATH_EXISTS_ERR',
   };
   var errname;
-  if(fileError.code in errormap)
-  {
+  if (fileError.code in errormap) {
     errname = errormap[fileError.code];
+  } else {
+    errname = "Error #" + fileError.code;
   }
-  else
-  {
-    errname = "Error #"+fileError.code;
-  }
-  var errtxt = "FileSystem API error: "+operation+" returned error "+errname;
+  var errtxt = "FileSystem API error: " + operation + " returned error " + errname;
   throw new Error(errtxt);
 };
 
-OpenJsCad.AlertUserOfUncaughtExceptions = function() {
-  window.onerror = function(message, url, line) {
+OpenJsCad.AlertUserOfUncaughtExceptions = function () {
+  window.onerror = function (message, url, line) {
     message = message.replace(/^Uncaught /i, "");
-    alert(message+"\n\n("+url+" line "+line+")");
+    alert(message + "\n\n(" + url + " line " + line + ")");
   };
 };
 
 // parse the jscad script to get the parameter definitions
-OpenJsCad.getParamDefinitions = function(script) {
+OpenJsCad.getParamDefinitions = function (script) {
   var scriptisvalid = true;
   var Fn = OpenJsCad.Function || Function;
-  try
-  {
+  try {
     // first try to execute the script itself
     // this will catch any syntax errors
     var f = new Fn(script);
     f();
-  }
-  catch(e) {
+  } catch (e) {
     scriptisvalid = false;
   }
   var params = [];
-  if(scriptisvalid)
-  {
+  if (scriptisvalid) {
     var script1 = "if(typeof(getParameterDefinitions) == 'function') {return getParameterDefinitions();} else {return [];} ";
     script1 += script;
     var f = new Fn(script1);
     params = f();
-    if( (typeof(params) != "object") || (typeof(params.length) != "number") )
-    {
+    if ((typeof (params) != "object") || (typeof (params.length) != "number")) {
       throw new Error("The getParameterDefinitions() function should return an array with the parameter definitions");
     }
   }
@@ -380,7 +333,7 @@ OpenJsCad.getParamDefinitions = function(script) {
  * - noWebGL: force render without webGL
  * - verbose: show additional info (currently only time used for rendering)
  */
-OpenJsCad.Processor = function(containerdiv, options, onchange) {
+OpenJsCad.Processor = function (containerdiv, options, onchange) {
   this.containerdiv = containerdiv;
   this.options = options = options || {};
   this.onchange = onchange;
@@ -424,29 +377,26 @@ OpenJsCad.Processor = function(containerdiv, options, onchange) {
   this.createElements();
 };
 
-OpenJsCad.Processor.convertToSolid = function(obj) {
-  if( (typeof(obj) == "object") && ((obj instanceof CAG)) )
-  {
+OpenJsCad.Processor.convertToSolid = function (obj) {
+  if ((typeof (obj) == "object") && ((obj instanceof CAG))) {
     // convert a 2D shape to a thin solid:
-    obj=obj.extrude({offset: [0,0,0.1]});
-  }
-  else if( (typeof(obj) == "object") && ((obj instanceof CSG)) )
-  {
+    obj = obj.extrude({
+      offset: [0, 0, 0.1]
+    });
+  } else if ((typeof (obj) == "object") && ((obj instanceof CSG))) {
     // obj already is a solid
-  }
-  else
-  {
+  } else {
     throw new Error("Cannot convert to solid");
   }
   return obj;
 };
 
 OpenJsCad.Processor.prototype = {
-  cleanOption: function(option, deflt) {
+  cleanOption: function (option, deflt) {
     return typeof option != "undefined" ? option : deflt;
   },
   // pass "faces" or "lines"
-  toggleDrawOption: function(str) {
+  toggleDrawOption: function (str) {
     if (str == 'faces' || str == 'lines' || str == 'grid') {
       var newState = !this.viewer.drawOptions[str];
       this.setDrawOption(str, newState);
@@ -454,22 +404,21 @@ OpenJsCad.Processor.prototype = {
     }
   },
   // e.g. setDrawOption('lines', false);
-  setDrawOption: function(str, bool) {
+  setDrawOption: function (str, bool) {
     if (str == 'faces' || str == 'lines') {
       this.viewer.drawOptions[str] = !!bool;
     }
     this.viewer.applyDrawOptions();
   },
 
-  handleResize: function() {
+  handleResize: function () {
     this.viewer && (this.viewer.handleResize());
   },
 
-  createElements: function() {
-    var that = this;//for event handlers
+  createElements: function () {
+    var that = this; //for event handlers
 
-    while(this.containerdiv.children.length > 0)
-    {
+    while (this.containerdiv.children.length > 0) {
       this.containerdiv.removeChild(this.containerdiv.children[0]);
     }
 
@@ -510,20 +459,20 @@ OpenJsCad.Processor.prototype = {
     this.statusdiv.appendChild(this.controldiv);
     this.abortbutton = document.createElement("button");
     this.abortbutton.innerHTML = "Abort";
-    this.abortbutton.onclick = function(e) {
+    this.abortbutton.onclick = function (e) {
       that.abort();
     };
     this.statusbuttons.appendChild(this.abortbutton);
 
     this.renderedElementDropdown = document.createElement("select");
-    this.renderedElementDropdown.onchange = function(e) {
+    this.renderedElementDropdown.onchange = function (e) {
       that.setSelectedObjectIndex(that.renderedElementDropdown.selectedIndex);
     };
     this.renderedElementDropdown.style.display = "none";
     this.statusbuttons.appendChild(this.renderedElementDropdown);
 
     this.formatDropdown = document.createElement("select");
-    this.formatDropdown.onchange = function(e) {
+    this.formatDropdown.onchange = function (e) {
       that.currentFormat = that.formatDropdown.options[that.formatDropdown.selectedIndex].value;
       that.updateDownloadLink();
     };
@@ -531,7 +480,7 @@ OpenJsCad.Processor.prototype = {
     this.statusbuttons.appendChild(this.formatDropdown);
 
     this.generateOutputFileButton = document.createElement("button");
-    this.generateOutputFileButton.onclick = function(e) {
+    this.generateOutputFileButton.onclick = function (e) {
       that.generateOutputFile();
     };
 
@@ -550,7 +499,7 @@ OpenJsCad.Processor.prototype = {
     this.parametersdiv.appendChild(this.parameterstable);
     var parseParametersButton = document.createElement("button");
     parseParametersButton.innerHTML = "Update";
-    parseParametersButton.onclick = function(e) {
+    parseParametersButton.onclick = function (e) {
       that.rebuildSolid();
     };
     this.parametersdiv.appendChild(parseParametersButton);
@@ -561,85 +510,68 @@ OpenJsCad.Processor.prototype = {
     this.clearViewer();
   },
 
-  getFilenameForRenderedObject: function() {
+  getFilenameForRenderedObject: function () {
     var filename = this.filename;
-    if(!filename) filename = "openjscad";
+    if (!filename) filename = "openjscad";
     var index = this.renderedElementDropdown.selectedIndex;
-    if(index >= 0)
-    {
+    if (index >= 0) {
       var renderedelement = this.currentObjects[index];
-      if('name' in renderedelement)
-      {
+      if ('name' in renderedelement) {
         filename = renderedelement.name;
-      }
-      else
-      {
-        filename += "_"+(index + 1);
+      } else {
+        filename += "_" + (index + 1);
       }
     }
     return filename;
   },
 
-  setRenderedObjects: function(obj) {
+  setRenderedObjects: function (obj) {
     // if obj is a single CSG or CAG, convert to the array format:
-    if(obj === null)
-    {
-      obj=[];
-    }
-    else
-    {
-      if( !(obj instanceof Array))
-      {
-        obj=[
+    if (obj === null) {
+      obj = [];
+    } else {
+      if (!(obj instanceof Array)) {
+        obj = [
           {
             data: obj,
           },
         ];
       }
     }
-    this.currentObjects=obj;
-    while(this.renderedElementDropdown.options.length > 0) this.renderedElementDropdown.options.remove(0);
+    this.currentObjects = obj;
+    while (this.renderedElementDropdown.options.length > 0) this.renderedElementDropdown.options.remove(0);
 
-    for(var i=0; i < obj.length; ++i)
-    {
+    for (var i = 0; i < obj.length; ++i) {
       var renderedelement = obj[i];
       var caption;
-      if('caption' in renderedelement)
-      {
+      if ('caption' in renderedelement) {
         caption = renderedelement.caption;
-      }
-      else if('name' in renderedelement)
-      {
+      } else if ('name' in renderedelement) {
         caption = renderedelement.name;
-      }
-      else
-      {
-        caption = "Element #"+(i+1);
+      } else {
+        caption = "Element #" + (i + 1);
       }
       var option = document.createElement("option");
       option.appendChild(document.createTextNode(caption));
       this.renderedElementDropdown.options.add(option);
     }
-    this.renderedElementDropdown.style.display = (obj.length >= 2)? "inline":"none";
-    this.setSelectedObjectIndex( (obj.length > 0)? 0:-1);
+    this.renderedElementDropdown.style.display = (obj.length >= 2) ? "inline" : "none";
+    this.setSelectedObjectIndex((obj.length > 0) ? 0 : -1);
   },
 
-  setSelectedObjectIndex: function(index) {
+  setSelectedObjectIndex: function (index) {
     this.clearOutputFile();
     this.renderedElementDropdown.selectedIndex = index;
     var obj;
-    if(index < 0)
-    {
+    if (index < 0) {
       obj = null;
-    }
-    else
-    {
-      obj=this.currentObjects[index].data;
+    } else {
+      obj = this.currentObjects[index].data;
     }
     this.currentObjectIndex = index;
     this.currentObject = obj;
 
-    while(this.formatDropdown.options.length > 0)
+    while (this.formatDropdown.options.length > 0)
       this.formatDropdown.options.remove(0);
 
     if (obj !== null) {
@@ -651,7 +583,7 @@ OpenJsCad.Processor.prototype = {
       this.viewer.setCsg(csg, this.isFirstRender_);
       this.hasValidCurrentObject = true;
 
-      this.supportedFormatsForCurrentObject().forEach(function(format) {
+      this.supportedFormatsForCurrentObject().forEach(function (format) {
         var option = document.createElement("option");
         option.setAttribute("value", format);
         option.appendChild(document.createTextNode(this.formatInfo(format).displayName));
@@ -668,74 +600,73 @@ OpenJsCad.Processor.prototype = {
 
   },
 
-  selectedFormat: function() {
+  selectedFormat: function () {
     return this.formatDropdown.options[this.formatDropdown.selectedIndex].value;
   },
 
-  selectedFormatInfo: function() {
+  selectedFormatInfo: function () {
     return this.formatInfo(this.selectedFormat());
   },
 
-  updateDownloadLink: function() {
+  updateDownloadLink: function () {
     var ext = this.selectedFormatInfo().extension;
-    this.generateOutputFileButton.innerHTML = "Generate "+ext.toUpperCase();
+    this.generateOutputFileButton.innerHTML = "Generate " + ext.toUpperCase();
   },
 
-  clearViewer: function() {
+  clearViewer: function () {
     this.clearOutputFile();
     this.setRenderedObjects(null);
     this.hasValidCurrentObject = false;
     this.enableItems();
   },
 
-  abort: function() {
-    if(this.processing)
-    {
+  abort: function () {
+    if (this.processing) {
       //todo: abort
-      this.processing=false;
+      this.processing = false;
       this.statusspan.innerHTML = "Aborted.";
       this.worker.terminate();
       this.enableItems();
-      if(this.onchange) this.onchange();
+      if (this.onchange) this.onchange();
     }
   },
 
-  enableItems: function() {
-    this.abortbutton.style.display = this.processing? "inline":"none";
-    this.formatDropdown.style.display = ((!this.hasOutputFile)&&(this.hasValidCurrentObject))? "inline":"none";
-    this.generateOutputFileButton.style.display = ((!this.hasOutputFile)&&(this.hasValidCurrentObject))? "inline":"none";
-    this.downloadOutputFileLink.style.display = this.hasOutputFile? "inline":"none";
-    this.parametersdiv.style.display = (this.paramControls.length > 0)? "block":"none";
-    this.errordiv.style.display = this.hasError? "block":"none";
-    this.statusdiv.style.display = this.hasError? "none":"block";
+  enableItems: function () {
+    this.abortbutton.style.display = this.processing ? "inline" : "none";
+    this.formatDropdown.style.display = ((!this.hasOutputFile) && (this.hasValidCurrentObject)) ? "inline" : "none";
+    this.generateOutputFileButton.style.display = ((!this.hasOutputFile) && (this.hasValidCurrentObject)) ? "inline" : "none";
+    this.downloadOutputFileLink.style.display = this.hasOutputFile ? "inline" : "none";
+    this.parametersdiv.style.display = (this.paramControls.length > 0) ? "block" : "none";
+    this.errordiv.style.display = this.hasError ? "block" : "none";
+    this.statusdiv.style.display = this.hasError ? "none" : "block";
   },
 
-  setOpenJsCadPath: function(path) {
-    this.options[ 'openJsCadPath' ] = path;
+  setOpenJsCadPath: function (path) {
+    this.options['openJsCadPath'] = path;
   },
 
-  addLibrary: function(lib) {
-    if( typeof this.options[ 'libraries' ] == 'undefined' ) {
-      this.options[ 'libraries' ] = [];
+  addLibrary: function (lib) {
+    if (typeof this.options['libraries'] == 'undefined') {
+      this.options['libraries'] = [];
     }
-    this.options[ 'libraries' ].push( lib );
+    this.options['libraries'].push(lib);
   },
 
-  setError: function(txt, err) {
+  setError: function (txt, err) {
     this.hasError = (txt != "");
     this.errorpre.textContent = txt;
     this.errorObject = err;
     this.enableItems();
   },
 
-  setDebugging: function(debugging) {
+  setDebugging: function (debugging) {
     this.debugging = debugging;
   },
 
   // script: javascript code
   // filename: optional, the name of the .jscad file
-  setJsCad: function(script, filename) {
-    if(!filename) filename = "openjscad.jscad";
+  setJsCad: function (script, filename) {
+    if (!filename) filename = "openjscad.jscad";
     filename = filename.replace(/\.jscad$/i, "");
     this.abort();
     this.clearViewer();
@@ -744,69 +675,50 @@ OpenJsCad.Processor.prototype = {
     this.script = null;
     this.setError("");
     var scripthaserrors = false;
-    try
-    {
+    try {
       this.paramDefinitions = OpenJsCad.getParamDefinitions(script);
       this.createParamControls();
-    }
-    catch(e)
-    {
+    } catch (e) {
       this.setError(e.toString(), e);
       this.statusspan.innerHTML = "Error.";
       scripthaserrors = true;
     }
-    if(!scripthaserrors)
-    {
+    if (!scripthaserrors) {
       this.script = script;
       this.filename = filename;
       this.rebuildSolid();
-    }
-    else
-    {
+    } else {
       this.enableItems();
-      if(this.onchange) this.onchange();
+      if (this.onchange) this.onchange();
     }
   },
 
-  getParamValues: function()
-  {
+  getParamValues: function () {
     var paramValues = {};
-    for(var i = 0; i < this.paramDefinitions.length; i++)
-    {
+    for (var i = 0; i < this.paramDefinitions.length; i++) {
       var paramdef = this.paramDefinitions[i];
       var type = "text";
-      if('type' in paramdef)
-      {
+      if ('type' in paramdef) {
         type = paramdef.type;
       }
       var control = this.paramControls[i];
       var value;
-      if( (type == "text") || (type == "longtext") || (type == "float") || (type == "int") )
-      {
+      if ((type == "text") || (type == "longtext") || (type == "float") || (type == "int")) {
         value = control.value;
-        if( (type == "float") || (type == "int") )
-        {
+        if ((type == "float") || (type == "int")) {
           var isnumber = !isNaN(parseFloat(value)) && isFinite(value);
-          if(!isnumber)
-          {
-            throw new Error("Not a number: "+value);
+          if (!isnumber) {
+            throw new Error("Not a number: " + value);
           }
-          if(type == "int")
-          {
+          if (type == "int") {
             value = parseInt(value, 10);
-          }
-          else
-          {
+          } else {
             value = parseFloat(value);
           }
         }
-      }
-      else if(type == "choice")
-      {
+      } else if (type == "choice") {
         value = control.options[control.selectedIndex].value;
-      }
-      else if(type == "bool")
-      {
+      } else if (type == "bool") {
         value = control.checked;
       }
       paramValues[paramdef.name] = value;
@@ -814,8 +726,7 @@ OpenJsCad.Processor.prototype = {
     return paramValues;
   },
 
-  rebuildSolid: function()
-  {
+  rebuildSolid: function () {
     this.abort();
     this.setError("");
     this.clearViewer();
@@ -828,121 +739,98 @@ OpenJsCad.Processor.prototype = {
     var options = {};
     var startTime = Date.now();
 
-      if(!useSync)
-      {
-      this.worker = OpenJsCad.parseJsCadScriptASync(this.script, paramValues, this.options, function(err, obj) {
+    if (!useSync) {
+      this.worker = OpenJsCad.parseJsCadScriptASync(this.script, paramValues, this.options, function (err, obj) {
         that.processing = false;
         that.worker.terminate();
         that.worker = null;
 
-        if(err)
-        {
-          var errtxt = "Error in line "+err.lineno+": "+err.message;
+        if (err) {
+          var errtxt = "Error in line " + err.lineno + ": " + err.message;
           that.setError(errtxt, err);
           that.statusspan.innerHTML = "Error.";
-        }
-        else
-        {
+        } else {
           that.setRenderedObjects(obj);
           var currentTime = Date.now();
           var elapsed = (currentTime - startTime);
           that.statusspan.innerHTML = "Ready." + (that.options.verbose ?
-              "  Rendered in " + elapsed + "ms" : "");
+            "  Rendered in " + elapsed + "ms" : "");
         }
         that.enableItems();
-        if(that.onchange) that.onchange();
+        if (that.onchange) that.onchange();
       });
-    }
-    else
-    {
-      try
-      {
+    } else {
+      try {
         var obj = OpenJsCad.parseJsCadScriptSync(this.script, paramValues, this.debugging);
         that.setRenderedObjects(obj);
         that.processing = false;
         that.statusspan.innerHTML = "Ready.";
-      }
-      catch(e)
-      {
+      } catch (e) {
         that.processing = false;
         var errtxt = e.toString();
-        if(e.stack)
-        {
-          errtxt += '\nStack trace:\n'+e.stack;
+        if (e.stack) {
+          errtxt += '\nStack trace:\n' + e.stack;
         }
-        that.setError (errtxt, e);
+        that.setError(errtxt, e);
         that.statusspan.innerHTML = "Error.";
       }
       that.enableItems();
-      if(that.onchange) that.onchange();
+      if (that.onchange) that.onchange();
     }
   },
 
-  hasSolid: function() {
+  hasSolid: function () {
     return this.hasValidCurrentObject;
   },
 
-  isProcessing: function() {
+  isProcessing: function () {
     return this.processing;
   },
 
-  clearOutputFile: function() {
-    if(this.hasOutputFile)
-    {
+  clearOutputFile: function () {
+    if (this.hasOutputFile) {
       this.hasOutputFile = false;
-      if(this.outputFileDirEntry)
-      {
-        this.outputFileDirEntry.removeRecursively(function(){});
-        this.outputFileDirEntry=null;
+      if (this.outputFileDirEntry) {
+        this.outputFileDirEntry.removeRecursively(function () {});
+        this.outputFileDirEntry = null;
       }
-      if(this.outputFileBlobUrl)
-      {
+      if (this.outputFileBlobUrl) {
         OpenJsCad.revokeBlobUrl(this.outputFileBlobUrl);
         this.outputFileBlobUrl = null;
       }
       this.enableItems();
-      if(this.onchange) this.onchange();
+      if (this.onchange) this.onchange();
     }
   },
 
-  generateOutputFile: function() {
+  generateOutputFile: function () {
     this.clearOutputFile();
-    if(this.hasValidCurrentObject)
-    {
-      try
-      {
+    if (this.hasValidCurrentObject) {
+      try {
         this.generateOutputFileFileSystem();
-      }
-      catch(e)
-      {
+      } catch (e) {
         this.generateOutputFileBlobUrl();
       }
     }
   },
 
-  currentObjectToBlob: function() {
+  currentObjectToBlob: function () {
     var format = this.selectedFormat();
 
     var blob;
-    if(format == "stl")
-    {
-      blob=this.currentObject.fixTJunctions().toStlBinary();
-    }
-    else if(format == "x3d") {
-      blob=this.currentObject.fixTJunctions().toX3D();
-    }
-    else if(format == "dxf")
-    {
-      blob=this.currentObject.toDxf();
-    }
-    else
-    {
+    if (format == "stl") {
+      blob = this.currentObject.fixTJunctions().toStlBinary();
+    } else if (format == "x3d") {
+      blob = this.currentObject.fixTJunctions().toX3D();
+    } else if (format == "dxf") {
+      blob = this.currentObject.toDxf();
+    } else {
       throw new Error("Not supported");
     }
     return blob;
   },
 
-  supportedFormatsForCurrentObject: function() {
+  supportedFormatsForCurrentObject: function () {
     if (this.currentObject instanceof CSG) {
       return ["stl", "x3d"];
     } else if (this.currentObject instanceof CAG) {
@@ -952,208 +840,185 @@ OpenJsCad.Processor.prototype = {
     }
   },
 
-  formatInfo: function(format) {
+  formatInfo: function (format) {
     return {
       stl: {
         displayName: "STL",
         extension: "stl",
         mimetype: "application/sla",
-        },
+      },
       x3d: {
         displayName: "X3D",
         extension: "x3d",
         mimetype: "model/x3d+xml",
-        },
+      },
       dxf: {
         displayName: "DXF",
         extension: "dxf",
         mimetype: "application/dxf",
-        }
+      }
     }[format];
   },
 
-  downloadLinkTextForCurrentObject: function() {
+  downloadLinkTextForCurrentObject: function () {
     var ext = this.selectedFormatInfo().extension;
-    return "Download "+ext.toUpperCase();
+    return "Download " + ext.toUpperCase();
   },
 
-  generateOutputFileBlobUrl: function() {
+  generateOutputFileBlobUrl: function () {
     var blob = this.currentObjectToBlob();
-    var windowURL=OpenJsCad.getWindowURL();
+    var windowURL = OpenJsCad.getWindowURL();
     this.outputFileBlobUrl = windowURL.createObjectURL(blob)
-    if(!this.outputFileBlobUrl) throw new Error("createObjectURL() failed");
+    if (!this.outputFileBlobUrl) throw new Error("createObjectURL() failed");
     this.hasOutputFile = true;
     this.downloadOutputFileLink.href = this.outputFileBlobUrl;
     this.downloadOutputFileLink.innerHTML = this.downloadLinkTextForCurrentObject();
     var ext = this.selectedFormatInfo().extension;
-    this.downloadOutputFileLink.setAttribute("download", "openjscad."+ext);
+    this.downloadOutputFileLink.setAttribute("download", "openjscad." + ext);
     this.enableItems();
-    if(this.onchange) this.onchange();
+    if (this.onchange) this.onchange();
   },
 
-  generateOutputFileFileSystem: function() {
-    window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-    if(!window.requestFileSystem)
-    {
+  generateOutputFileFileSystem: function () {
+    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+    if (!window.requestFileSystem) {
       throw new Error("Your browser does not support the HTML5 FileSystem API. Please try the Chrome browser instead.");
     }
     // create a random directory name:
-    var dirname = "OpenJsCadOutput1_"+parseInt(Math.random()*1000000000, 10)+"."+extension;
+    var dirname = "OpenJsCadOutput1_" + parseInt(Math.random() * 1000000000, 10) + "." + extension;
     var extension = this.selectedFormatInfo().extension;
-    var filename = this.getFilenameForRenderedObject()+"."+extension;
+    var filename = this.getFilenameForRenderedObject() + "." + extension;
     var that = this;
-    window.requestFileSystem(TEMPORARY, 20*1024*1024, function(fs){
-        fs.root.getDirectory(dirname, {create: true, exclusive: true}, function(dirEntry) {
+    window.requestFileSystem(TEMPORARY, 20 * 1024 * 1024, function (fs) {
+        fs.root.getDirectory(dirname, {
+            create: true,
+            exclusive: true
+          }, function (dirEntry) {
             that.outputFileDirEntry = dirEntry;
-            dirEntry.getFile(filename, {create: true, exclusive: true}, function(fileEntry) {
-                 fileEntry.createWriter(function(fileWriter) {
-                    fileWriter.onwriteend = function(e) {
+            dirEntry.getFile(filename, {
+                create: true,
+                exclusive: true
+              }, function (fileEntry) {
+                fileEntry.createWriter(function (fileWriter) {
+                    fileWriter.onwriteend = function (e) {
                       that.hasOutputFile = true;
                       that.downloadOutputFileLink.href = fileEntry.toURL();
                       that.downloadOutputFileLink.type = that.selectedFormatInfo().mimetype;
                       that.downloadOutputFileLink.innerHTML = that.downloadLinkTextForCurrentObject();
                       that.downloadOutputFileLink.setAttribute("download", fileEntry.name);
                       that.enableItems();
-                      if(that.onchange) that.onchange();
+                      if (that.onchange) that.onchange();
                     };
-                    fileWriter.onerror = function(e) {
+                    fileWriter.onerror = function (e) {
                       throw new Error('Write failed: ' + e.toString());
                     };
                     var blob = that.currentObjectToBlob();
                     fileWriter.write(blob);
                   },
-                  function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "createWriter");}
+                  function (fileerror) {
+                    OpenJsCad.FileSystemApiErrorHandler(fileerror, "createWriter");
+                  }
                 );
               },
-              function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getFile('"+filename+"')");}
+              function (fileerror) {
+                OpenJsCad.FileSystemApiErrorHandler(fileerror, "getFile('" + filename + "')");
+              }
             );
           },
-          function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getDirectory('"+dirname+"')");}
+          function (fileerror) {
+            OpenJsCad.FileSystemApiErrorHandler(fileerror, "getDirectory('" + dirname + "')");
+          }
         );
       },
-      function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "requestFileSystem");}
+      function (fileerror) {
+        OpenJsCad.FileSystemApiErrorHandler(fileerror, "requestFileSystem");
+      }
     );
   },
 
-  createParamControls: function() {
+  createParamControls: function () {
     this.parameterstable.innerHTML = "";
     this.paramControls = [];
     var paramControls = [];
     var tablerows = [];
-    for(var i = 0; i < this.paramDefinitions.length; i++)
-    {
-      var errorprefix = "Error in parameter definition #"+(i+1)+": ";
+    for (var i = 0; i < this.paramDefinitions.length; i++) {
+      var errorprefix = "Error in parameter definition #" + (i + 1) + ": ";
       var paramdef = this.paramDefinitions[i];
-      if(!('name' in paramdef))
-      {
+      if (!('name' in paramdef)) {
         throw new Error(errorprefix + "Should include a 'name' parameter");
       }
       var type = "text";
-      if('type' in paramdef)
-      {
+      if ('type' in paramdef) {
         type = paramdef.type;
       }
-      if( (type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") && (type !== "longtext") && (type !== "bool") )
-      {
-        throw new Error(errorprefix + "Unknown parameter type '"+type+"'");
+      if ((type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") && (type !== "longtext") && (type !== "bool")) {
+        throw new Error(errorprefix + "Unknown parameter type '" + type + "'");
       }
       var initial;
-      if('initial' in paramdef)
-      {
+      if ('initial' in paramdef) {
         initial = paramdef.initial;
-      }
-      else if('default' in paramdef)
-      {
+      } else if ('default' in paramdef) {
         initial = paramdef['default'];
       }
       var control;
-      if( (type == "text") || (type == "int") || (type == "float") )
-      {
+      if ((type == "text") || (type == "int") || (type == "float")) {
         control = document.createElement("input");
         control.type = "text";
-        if(initial !== undefined)
-        {
+        if (initial !== undefined) {
           control.value = initial;
-        }
-        else
-        {
-          if( (type == "int") || (type == "float") )
-          {
+        } else {
+          if ((type == "int") || (type == "float")) {
             control.value = "0";
-          }
-          else
-          {
+          } else {
             control.value = "";
           }
         }
-      }
-      else if(type == "choice")
-      {
-        if(!('values' in paramdef))
-        {
+      } else if (type == "choice") {
+        if (!('values' in paramdef)) {
           throw new Error(errorprefix + "Should include a 'values' parameter");
         }
         control = document.createElement("select");
         var values = paramdef.values;
         var captions;
-        if('captions' in paramdef)
-        {
+        if ('captions' in paramdef) {
           captions = paramdef.captions;
-          if(captions.length != values.length)
-          {
+          if (captions.length != values.length) {
             throw new Error(errorprefix + "'captions' and 'values' should have the same number of items");
           }
-        }
-        else
-        {
+        } else {
           captions = values;
         }
         var selectedindex = 0;
-        for(var valueindex = 0; valueindex < values.length; valueindex++)
-        {
+        for (var valueindex = 0; valueindex < values.length; valueindex++) {
           var option = document.createElement("option");
           option.value = values[valueindex];
           option.text = captions[valueindex];
           control.add(option);
-          if(initial !== undefined)
-          {
-            if(initial == values[valueindex])
-            {
+          if (initial !== undefined) {
+            if (initial == values[valueindex]) {
               selectedindex = valueindex;
             }
           }
         }
-        if(values.length > 0)
-        {
+        if (values.length > 0) {
           control.selectedIndex = selectedindex;
         }
-      }
-      else if(type == "longtext")
-      {
+      } else if (type == "longtext") {
         control = document.createElement("textarea");
-        if(initial !== undefined)
-        {
+        if (initial !== undefined) {
           control.value = initial;
-        }
-        else
-        {
+        } else {
           control.value = "";
         }
-      }
-      else if(type == "bool")
-      {
+      } else if (type == "bool") {
         control = document.createElement("input");
         control.type = "checkbox";
-        if(initial !== undefined)
-        {
-          if(typeof(initial) != "boolean")
-          {
+        if (initial !== undefined) {
+          if (typeof (initial) != "boolean") {
             throw new Error(errorprefix + "initial/default of type 'bool' has to be boolean (true/false)");
           }
           control.checked = initial;
-        }
-        else
-        {
+        } else {
           control.checked = false;
         }
       }
@@ -1161,12 +1026,10 @@ OpenJsCad.Processor.prototype = {
       var tr = document.createElement("tr");
       var td = document.createElement("td");
       var label = paramdef.name + ":";
-      if('caption' in paramdef)
-      {
+      if ('caption' in paramdef) {
         label = paramdef.caption;
       }
-      if('visible' in paramdef)
-      {
+      if ('visible' in paramdef) {
         tr.style.display = (paramdef.visible) ? "table-row" : "none";
       }
 
@@ -1178,7 +1041,7 @@ OpenJsCad.Processor.prototype = {
       tablerows.push(tr);
     }
     var that = this;
-    tablerows.map(function(tr){
+    tablerows.map(function (tr) {
       that.parameterstable.appendChild(tr);
     });
     this.paramControls = paramControls;

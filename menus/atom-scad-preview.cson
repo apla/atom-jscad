@@ -14,14 +14,14 @@
   ]
   '.tree-view .file .name[data-name$=\\.jscad]': [
     {
-      'label': 'Preview JSCAD'
-      'command':  'atom-scad-preview:toggle'
+      'label': 'Preview JSCAD file'
+      'command':  'atom-scad-preview:preview-file'
     }
   ]
   '.tree-view .file .name[data-name$=\\.scad]': [
     {
-      'label': 'Preview SCAD'
-      'command':  'atom-scad-preview:toggle'
+      'label': 'Preview SCAD file'
+      'command':  'atom-scad-preview:preview-file'
     }
   ]
 'menu': [

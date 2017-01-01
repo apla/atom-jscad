@@ -2,21 +2,21 @@ var AtomScadPreview;
 
 AtomScadPreview = require('../lib/atom-scad-preview');
 
-describe("AtomScadPreview", function() {
+describe("AtomScadPreview", function () {
   var activationPromise, ref, workspaceElement;
   ref = [], workspaceElement = ref[0], activationPromise = ref[1];
-  beforeEach(function() {
+  beforeEach(function () {
     workspaceElement = atom.views.getView(atom.workspace);
     return activationPromise = atom.packages.activatePackage('atom-scad-preview');
   });
-  return describe("when the atom-scad-preview:toggle event is triggered", function() {
-    it("hides and shows the modal panel", function() {
+  return describe("when the atom-scad-preview:toggle event is triggered", function () {
+    it("hides and shows the modal panel", function () {
       expect(workspaceElement.querySelector('.atom-scad-preview')).not.toExist();
       atom.commands.dispatch(workspaceElement, 'atom-scad-preview:toggle');
-      waitsForPromise(function() {
+      waitsForPromise(function () {
         return activationPromise;
       });
-      return runs(function() {
+      return runs(function () {
         var atomScadPreviewElement, atomScadPreviewPanel;
         expect(workspaceElement.querySelector('.atom-scad-preview')).toExist();
         atomScadPreviewElement = workspaceElement.querySelector('.atom-scad-preview');
@@ -27,14 +27,14 @@ describe("AtomScadPreview", function() {
         return expect(atomScadPreviewPanel.isVisible()).toBe(false);
       });
     });
-    return it("hides and shows the view", function() {
+    return it("hides and shows the view", function () {
       jasmine.attachToDOM(workspaceElement);
       expect(workspaceElement.querySelector('.atom-scad-preview')).not.toExist();
       atom.commands.dispatch(workspaceElement, 'atom-scad-preview:toggle');
-      waitsForPromise(function() {
+      waitsForPromise(function () {
         return activationPromise;
       });
-      return runs(function() {
+      return runs(function () {
         var atomScadPreviewElement;
         atomScadPreviewElement = workspaceElement.querySelector('.atom-scad-preview');
         expect(atomScadPreviewElement).toBeVisible();
