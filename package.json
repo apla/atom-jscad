@@ -11,7 +11,10 @@
     "threejs"
   ],
   "activationCommands": {
-    "atom-workspace": ["atom-scad-preview:toggle", "atom-scad-preview:preview-file"]
+    "atom-workspace": [
+      "atom-scad-preview:toggle",
+      "atom-scad-preview:preview-file"
+    ]
   },
   "scripts": {
     "build-csg-three-js": "pushd standalone && cat three.min.js orbitcontrols.js projector.js canvasrenderer.js csg.js formats.js threecsg.js openjscad.js > openjscad-bundle.js && popd"
@@ -22,8 +25,13 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "atom-space-pen-views": "^2.2.0",
     "event-kit": "^2.2.0",
-    "loophole": "^1.1.0"
+    "jquery": "^3.1.1",
+    "jquery-watch": "^1.21.0",
+    "lodash": "^4.17.4",
+    "loophole": "^1.1.0",
+    "three": "^0.83.0"
   }
 }

@@ -5,7 +5,7 @@
 // License: MIT License
 //
 // Description:
-// Helping to convert OpenSCAD .scad files to OpenJSCad .jscad files with
+// Helping to convert OpenSCAD .scad files to OpenJSCad .jscad files with 
 // little editing, can be used at
 //     http://joostn.github.com/OpenJsCad/processfile.html
 //
@@ -13,6 +13,8 @@
 //     http://openjscad.org/
 //
 // History:
+// 2016/10/01: 0.5.2: fixed difference() and intersection() functions for CAG by fischman
+// 2016/06/27: 0.5.1: incrementing version number for release
 // 2016/05/01: 0.5.0: added options to Processor and View classes, allow more flexibility in HTML by Z3 Dev
 // 2016/02/02: 0.4.0: GUI refactored, functionality split up into more files, mostly done by Z3 Dev
 // 2015/05/20: 0.2.4: renumbering to 0.024 -> 0.2.4
@@ -34,7 +36,7 @@
 // 2013/03/12: 0.008: covering most mathematical function of OpenSCAD in JS as well
 // 2013/03/11: 0.007: most function transforming CSG now take array as well, more functions for OpenSCAD-alike behaviour
 // 2013/03/10: 0.006: colored intersection() & difference(), added mirror(), cylinder supports start/end coordinates too
-// 2013/03/04: 0.005: intersect() -> intersection(), sin, cos, asin, acos included, more examples
+// 2013/03/04: 0.005: intersect() -> intersection(), sin, cos, asin, acos included, more examples 
 // 2013/03/02: 0.004: better install, examples/, etc refinements (working on 2d primitives)
 // 2013/03/01: 0.003: example.jscad vs example.scad, openscad.js/.jscad split up, and openjscad cli in nodejs implemented
 // 2013/02/28: 0.002: center:false default
@@ -50,7 +52,7 @@
 //       }
 //       translate([10,5,5]) scale([0.5,1,2]) sphere(r=5,$fn=50);
 //       translate([-15,0,0]) cylinder(r1=2,r2=0,h=10,$fn=20);
-//
+//      
 //    for(i=[0:19]) {
 //       rotate([0,i/20*360,0]) translate([i,0,0]) rotate([0,i/20*90,i/20*90,0]) cube(size=[1,1.2,.5],center=true);
 //    }
@@ -76,7 +78,7 @@
 // }
 
 function version() {
-  return [0,5,0];
+  return [0,5,2];
 }
 
 function JStoMeta(src) {
@@ -283,39 +285,39 @@ function color() {
    if(a[i].length) { a = a[i], i = 0; }                       // next arg an array, make it our main array to walk through
    if(typeof c == 'string')
       c = map[c.toLowerCase()];
-   if(alpha!==undefined)
+   if(alpha!==undefined) 
       c = c.concat(alpha);
-   for(o=a[i++]; i<a.length; i++) {
+   for(o=a[i++]; i<a.length; i++) { 
       o = o.union(a[i]);
-   }
+   } 
    return o.setColor(c);
 }
 
 // -- 3D operations (OpenSCAD like notion)
 
 function group() {                              // experimental
-   var o,i=0,a=arguments;
-   if(a[0].length) a = a[0];
-
+   var o,i=0,a=arguments; 
+   if(a[0].length) a = a[0]; 
+   
    if((typeof(a[i]) == "object") && (a[i] instanceof CAG)) {
       o = a[i].extrude({offset: [0,0,0.1]});    // -- convert a 2D shape to a thin solid, note: do not a[i] = a[i].extrude()
    } else {
-      o = a[i++];
+      o = a[i++];                               
    }
-   for(; i<a.length; i++) {
+   for(; i<a.length; i++) { 
       var obj = a[i];
       if((typeof(a[i]) == "object") && (a[i] instanceof CAG)) {
          obj = a[i].extrude({offset: [0,0,0.1]});    // -- convert a 2D shape to a thin solid:
       }
-      o = o.unionForNonIntersecting(obj);
-   }
-   return o;
+      o = o.unionForNonIntersecting(obj); 
+   } 
+   return o; 
 }
 
-function union() {
-   var o,i=0,a=arguments;
-   if(a[0].length) a = a[0];
-
+function union() { 
+   var o,i=0,a=arguments; 
+   if(a[0].length) a = a[0]; 
+   
    o = a[i++];
    if(0) {     // we leave to code for now, perhaps later we allow mixed CAG/CSG union
       if((typeof(a[i]) == "object") && (a[i] instanceof CAG)) {
@@ -324,41 +326,49 @@ function union() {
          o = a[i++];
       }
    }
-   for(; i<a.length; i++) {
+   for(; i<a.length; i++) { 
       var obj = a[i];
 
       // for now disabled, later perhaps allow mixed union of CAG/CSG
       if(0&&(typeof(a[i]) == "object") && (a[i] instanceof CAG)) {
          obj = a[i].extrude({offset: [0,0,0.1]});    // -- convert a 2D shape to a thin solid:
       }
-      o = o.union(obj);
-   }
-   return o;
+      o = o.union(obj); 
+   } 
+   return o; 
 }
 
-function difference() {
-   var o,i=0,a=arguments;
-   if(a[0].length) a = a[0];
+function difference() { 
+   var o,i=0,a=arguments; 
+   if(a[0].length) a = a[0]; 
    for(o=a[i++]; i<a.length; i++) {
-      o = o.subtract(a[i].setColor(1,1,0));     // -- color the cuts
+      if (a[i] instanceof CAG) {
+         o = o.subtract(a[i]);
+      } else {
+         o = o.subtract(a[i].setColor(1,1,0));     // -- color the cuts
+      }
    }
-   return o;
+   return o; 
 }
 
-function intersection() {
-   var o,i=0,a=arguments;
-   if(a[0].length) a = a[0];
-   for(o=a[i++]; i<a.length; i++) {
-      o = o.intersect(a[i].setColor(1,1,0));    // -- color the cuts
+function intersection() { 
+   var o,i=0,a=arguments; 
+   if(a[0].length) a = a[0]; 
+   for(o=a[i++]; i<a.length; i++) { 
+      if (a[i] instanceof CAG) {
+         o = o.intersect(a[i]);
+      } else {
+         o = o.intersect(a[i].setColor(1,1,0));     // -- color the cuts
+      }
    }
-   return o;
+   return o; 
 }
 
 // -- 3D primitives (OpenSCAD like notion)
 
-function cube(p) {
+function cube(p) { 
    var s = 1, v = null, off = [0,0,0], round = false, r = 0, fn = 8;
-   if(p&&p.length) v = p;
+   if(p&&p.length) v = p;		
    if(p&&p.size&&p.size.length) v = p.size;        // { size: [1,2,3] }
    if(p&&p.size&&!p.size.length) s = p.size;       // { size: 1 }
    //if(p&&!p.size&&!p.length&&p.center===undefined&&!p.round&&!p.radius) s = p;      // (2)
@@ -367,9 +377,9 @@ function cube(p) {
    if(p&&p.radius) { round = true, r = p.radius; }
    if(p&&p.fn) fn = p.fn;              // applies in case of round: true
 
-   var x = s, y = s, z = s;
-   if(v&&v.length) {
-      x = v[0], y = v[1], z = v[2];
+   var x = s, y = s, z = s; 
+   if(v&&v.length) { 
+      x = v[0], y = v[1], z = v[2]; 
    }
    off = [x/2,y/2,z/2];       // center: false default
    var o = round?
@@ -377,7 +387,7 @@ function cube(p) {
       CSG.cube({radius:[x/2,y/2,z/2]});
    if(p&&p.center&&p.center.length) {
       off = [p.center[0]?0:x/2, p.center[1]?0:y/2,p.center[2]?0:z/2];
-   } else if(p&&p.center==true) {
+   } else if(p&&p.center==true) { 
       off = [0,0,0];
    } else if(p&&p.center==false) {
       off = [x/2,y/2,z/2];
@@ -390,9 +400,9 @@ function cube(p) {
 function sphere(p) {
    var r = 1;
    var fn = 32;
-   var off = [0,0,0];
+   var off = [0,0,0];      
    var type = 'normal';
-
+   
    //var zoff = 0; // sphere() in openscad has no center:true|false
    if(p&&p.r) r = p.r;
    if(p&&p.fn) fn = p.fn;
@@ -404,12 +414,12 @@ function sphere(p) {
    var o;
    if(type=='geodesic')
       o = geodesicSphere(p);
-   else
+   else 
       o = CSG.sphere({radius:r,resolution:fn});
-
+   
    if(p&&p.center&&p.center.length) {         // preparing individual x,y,z center
       off = [p.center[0]?0:r,p.center[1]?0:r,p.center[2]?0:r];
-   } else if(p&&p.center==true) {
+   } else if(p&&p.center==true) { 
       off = [0,0,0];
    } else if(p&&p.center==false) {
       off = [r,r,r];
@@ -419,7 +429,7 @@ function sphere(p) {
 }
 
 function geodesicSphere(p) {
-   var r = 1, fn = 5;
+   var r = 1, fn = 5; 
 
    var ci = [              // hard-coded data of icosahedron (20 faces, all triangles)
       [0.850651,0.000000,-0.525731],
@@ -434,25 +444,25 @@ function geodesicSphere(p) {
       [0.525731,-0.850651,-0.000000],
       [0.525731,0.850651,0.000000],
       [-0.525731,0.850651,0.000000]];
-
-   var ti = [ [0,9,1], [1,10,0], [6,7,0], [10,6,0], [7,9,0], [5,1,4], [4,1,9], [5,10,1], [2,8,3], [3,11,2], [2,5,4],
+   
+   var ti = [ [0,9,1], [1,10,0], [6,7,0], [10,6,0], [7,9,0], [5,1,4], [4,1,9], [5,10,1], [2,8,3], [3,11,2], [2,5,4], 
       [4,8,2], [2,11,5], [3,7,6], [6,11,3], [8,7,3], [9,8,4], [11,10,5], [10,11,6], [8,9,7]];
-
+   
    var geodesicSubDivide = function(p,fn,off) {
       var p1 = p[0], p2 = p[1], p3 = p[2];
       var n = off;
       var c = [];
       var f = [];
-
+   
       //           p3
       //           /\
       //          /__\     fn = 3
       //      i  /\  /\
       //        /__\/__\       total triangles = 9 (fn*fn)
-      //       /\  /\  /\
-      //     0/__\/__\/__\
+      //       /\  /\  /\         
+      //     0/__\/__\/__\   
       //    p1 0   j      p2
-
+   
       for(var i=0; i<fn; i++) {
          for(var j=0; j<fn-i; j++) {
             var t0 = i/fn;
@@ -461,11 +471,11 @@ function geodesicSphere(p) {
             var s1 = (j+1)/(fn-i);
             var s2 = fn-i-1?j/(fn-i-1):1;
             var q = [];
-
+            
             q[0] = mix3(mix3(p1,p2,s0),p3,t0);
             q[1] = mix3(mix3(p1,p2,s1),p3,t0);
             q[2] = mix3(mix3(p1,p2,s2),p3,t1);
-
+            
             // -- normalize
             for(var k=0; k<3; k++) {
                var r = Math.sqrt(q[k][0]*q[k][0]+q[k][1]*q[k][1]+q[k][2]*q[k][2]);
@@ -475,13 +485,13 @@ function geodesicSphere(p) {
             }
             c.push(q[0],q[1],q[2]);
             f.push([n,n+1,n+2]); n += 3;
-
+            
             if(j<fn-i-1) {
                var s3 = fn-i-1?(j+1)/(fn-i-1):1;
                q[0] = mix3(mix3(p1,p2,s1),p3,t0);
                q[1] = mix3(mix3(p1,p2,s3),p3,t1);
                q[2] = mix3(mix3(p1,p2,s2),p3,t1);
-
+   
                // -- normalize
                for(var k=0; k<3; k++) {
                   var r = Math.sqrt(q[k][0]*q[k][0]+q[k][1]*q[k][1]+q[k][2]*q[k][2]);
@@ -493,10 +503,10 @@ function geodesicSphere(p) {
                f.push([n,n+1,n+2]); n += 3;
             }
          }
-      }
+      } 
       return { points: c, triangles: f, off: n };
    }
-
+   
    var mix3 = function(a,b,f) {
       var _f = 1-f;
       var c = [];
@@ -512,7 +522,7 @@ function geodesicSphere(p) {
    }
 
    if(fn<=0) fn = 1;
-
+   
    var q = [];
    var c = [], f = [];
    var off = 0;
@@ -533,7 +543,7 @@ function cylinder(p) {
       r1 = r2 = p.d/2;
    }
    if(p&&p.r) {
-      r1 = p.r; r2 = p.r;
+      r1 = p.r; r2 = p.r; 
    }
    if(p&&p.h) {
       h = p.h;
@@ -544,7 +554,7 @@ function cylinder(p) {
    if(p&&(p.d1||p.d2)) {
       r1 = p.d1/2; r2 = p.d2/2;
    }
-
+    
    if(a&&a[0]&&a[0].length) {
       a = a[0]; r1 = a[0]; r2 = a[1]; h = a[2]; if(a.length==4) fn = a[3];
    }
@@ -563,7 +573,7 @@ function cylinder(p) {
       var r = r1>r2?r1:r2;
       if(p&&p.center&&p.center.length) {         // preparing individual x,y,z center
          off = [p.center[0]?0:r,p.center[1]?0:r,p.center[2]?-h/2:0];
-      } else if(p&&p.center==true) {
+      } else if(p&&p.center==true) { 
          off = [0,0,-h/2];
       } else if(p&&p.center==false) {
          off = [0,0,0];
@@ -589,61 +599,61 @@ function torus(p) {
    return rotate_extrude({fn:fno},c.translate([ro,0,0]));
 }
 
-function polyhedron(p) {
-   //console.log("polyhedron() not yet implemented");
+function polyhedron(p) { 
    var pgs = [];
    var ref = p.triangles||p.polygons;
-
+   var colors = p.colors||null;
+   
    for(var i=0; i<ref.length; i++) {
-      var pp = [];
+      var pp = []; 
       for(var j=0; j<ref[i].length; j++) {
          pp[j] = p.points[ref[i][j]];
       }
 
       var v = [];
       for(j=ref[i].length-1; j>=0; j--) {       // --- we reverse order for examples of OpenSCAD work
-      //for(var j=0; j<ref[i].length-1; j++) {
          v.push(new CSG.Vertex(new CSG.Vector3D(pp[j][0],pp[j][1],pp[j][2])));
       }
-      pgs.push(new CSG.Polygon(v));
+      var s = CSG.Polygon.defaultShared;
+      if (colors && colors[i]) {
+         s = CSG.Polygon.Shared.fromColor(colors[i]);
+      }
+      pgs.push(new CSG.Polygon(v,s));
    }
    var r = CSG.fromPolygons(pgs);
-   //r.properties.polyhedron = new CSG.Properties();
-   //r.properties.polyhedron.center = new CSG.Vector3D(center);
-   //r.properties.sphere.facepoint = center.plus(xvector);
-   return r;
+   return r;   
 }
-
+   
 // -- 3D transformations (OpenSCAD like notion)
 
 function translate() {      // v, obj or array
    var a = arguments, v = a[0], o, i = 1;
    if(a[1].length) { a = a[1]; i = 0; }
-   for(o=a[i++]; i<a.length; i++) {
+   for(o=a[i++]; i<a.length; i++) { 
       o = o.union(a[i]);
-   }
-   return o.translate(v);
+   } 
+   return o.translate(v); 
 }
 
 function center() { // v, obj or array
    var a = arguments, v = a[0], o, i = 1;
    if(a[1].length) { a = a[1]; i = 0; }
-   for(o=a[i++]; i<a.length; i++) {
+   for(o=a[i++]; i<a.length; i++) { 
       o = o.union(a[i]);
-   }
+   } 
    return o.center(v);
 }
 
 function scale() {         // v, obj or array
    var a = arguments, v = a[0], o, i = 1;
    if(a[1].length) { a = a[1]; i = 0; }
-   for(o=a[i++]; i<a.length; i++) {
+   for(o=a[i++]; i<a.length; i++) { 
       o = o.union(a[i]);
-   }
-   return o.scale(v);
+   } 
+   return o.scale(v); 
 }
 
-function rotate() {
+function rotate() { 
    var o,i,v, r = 1, a = arguments;
    if(!a[0].length) {        // rotate(r,[x,y,z],o)
       r = a[0];
@@ -655,9 +665,9 @@ function rotate() {
       i = 1;
       if(a[1].length) { a = a[1]; i = 0; }
    }
-   for(o=a[i++]; i<a.length; i++) {
+   for(o=a[i++]; i<a.length; i++) { 
       o = o.union(a[i]);
-   }
+   } 
    if(r!=1) {
       return o.rotateX(v[0]*r).rotateY(v[1]*r).rotateZ(v[2]*r);
    } else {
@@ -684,17 +694,17 @@ function contract(r,n,o) {
 }
 
 function multmatrix() {
-   console.log("multmatrix() not yet implemented");
+   console.log("multmatrix() not yet implemented"); 
 }
 
 function minkowski() {
-   console.log("minkowski() not yet implemented");
+   console.log("minkowski() not yet implemented"); 
 }
 
 function hull() {
    var pts = [];
 
-   var a = arguments;
+   var a = arguments;                     
    if(a[0].length) a = a[0];
    var done = [];
 
@@ -723,7 +733,7 @@ function hull() {
       this.index = i;
       this.angle = a;
       this.distance = d;
-
+   
       this.compare = function(p) {
          if (this.angle<p.angle)
             return -1;
@@ -738,44 +748,44 @@ function hull() {
          return 0;
       }
    }
-
+   
    var ConvexHull = function() {
       this.points = null;
       this.indices = null;
-
+   
       this.getIndices = function() {
          return this.indices;
       }
-
+   
       this.clear = function() {
          this.indices = null;
          this.points = null;
       }
-
+   
       this.ccw = function(p1, p2, p3) {
-         var ccw = (this.points[p2].x - this.points[p1].x)*(this.points[p3].y - this.points[p1].y) -
+         var ccw = (this.points[p2].x - this.points[p1].x)*(this.points[p3].y - this.points[p1].y) - 
                    (this.points[p2].y - this.points[p1].y)*(this.points[p3].x - this.points[p1].x);
          if(ccw<1e-5)      // we need this, otherwise sorting never ends, see https://github.com/Spiritdude/OpenJSCAD.org/issues/18
             return 0
          return ccw;
       }
-
+   
       this.angle = function(o, a) {
-         //return Math.atan((this.points[a].y-this.points[o].y) / (this.points[a].x - this.points[o].x));
+         //return Math.atan((this.points[a].y-this.points[o].y) / (this.points[a].x - this.points[o].x)); 
          return Math.atan2((this.points[a].y-this.points[o].y), (this.points[a].x - this.points[o].x));
       }
-
+       
       this.distance = function(a, b) {
          return ((this.points[b].x-this.points[a].x)*(this.points[b].x-this.points[a].x)+
                  (this.points[b].y-this.points[a].y)*(this.points[b].y-this.points[a].y));
       }
-
+   
       this.compute = function(_points) {
          this.indices=null;
          if (_points.length<3)
             return;
          this.points=_points;
-
+   
          // Find the lowest point
          var min = 0;
          for(var i = 1; i < this.points.length; i++) {
@@ -786,7 +796,7 @@ function hull() {
             else if(this.points[i].y<this.points[min].y)
                min = i;
          }
-
+   
          // Calculate angle and distance from base
          var al = new Array();
          var ang = 0.0;
@@ -800,9 +810,9 @@ function hull() {
             dist = this.distance(min, i);
             al.push(new ConvexHullPoint(i, ang, dist));
          }
-
+   
          al.sort(function (a, b) { return a.compare(b); });
-
+   
          // Create stack
          var stack = new Array(this.points.length+1);
          var j = 2;
@@ -814,7 +824,7 @@ function hull() {
          }
          stack[0] = stack[this.points.length];
          stack[1] = min;
-
+   
          var tmp;
          var M = 2;
          for(i = 3; i<=this.points.length; i++) {
@@ -825,7 +835,7 @@ function hull() {
             stack[i] = stack[M];
             stack[M] = tmp;
          }
-
+   
          this.indices = new Array(M);
          for (i = 0; i<M; i++) {
             this.indices[i] = stack[i+1];
@@ -857,13 +867,13 @@ function chain_hull() {
    var a = arguments;
    var j = 0, closed = false;
 
-   if(a[j].closed!==undefined)
+   if(a[j].closed!==undefined) 
       closed = a[j++].closed;
-
-   if(a[j].length)
+   
+   if(a[j].length) 
       a = a[j];
 
-   var h = []; var n = a.length-(closed?0:1);
+   var h = []; var n = a.length-(closed?0:1); 
    for(var i=0; i<n; i++) {
       h.push(hull(a[i],a[(i+1)%a.length]));
    }
@@ -910,14 +920,14 @@ function rotate_extrude(p,o) {
          m = new CSG.Matrix4x4.rotationZ(i/fn*360);
          p[0] = new CSG.Vector3D(o.sides[j].vertex0.pos.x,0,o.sides[j].vertex0.pos.y);
          p[0] = m.rightMultiply1x3Vector(p[0]);
-
+         
          p[1] = new CSG.Vector3D(o.sides[j].vertex1.pos.x,0,o.sides[j].vertex1.pos.y);
          p[1] = m.rightMultiply1x3Vector(p[1]);
-
+         
          m = new CSG.Matrix4x4.rotationZ((i+1)/fn*360);
          p[2] = new CSG.Vector3D(o.sides[j].vertex1.pos.x,0,o.sides[j].vertex1.pos.y);
          p[2] = m.rightMultiply1x3Vector(p[2]);
-
+         
          p[3] = new CSG.Vector3D(o.sides[j].vertex0.pos.x,0,o.sides[j].vertex0.pos.y);
          p[3] = m.rightMultiply1x3Vector(p[3]);
 
@@ -974,7 +984,7 @@ function circle() {
    if(p&&p.fn) fn = p.fn;
    if(p&&!p.r&&!p.fn&&!p.center) r = p;
    off = [r,r];
-   if(p&&p.center==true) { off = [0,0]; }
+   if(p&&p.center==true) { off = [0,0]; } 
    var o = CAG.circle({center:off,radius:r,resolution:fn});
    return o;
 }
@@ -1076,7 +1086,7 @@ function lookup(ix,v) {
             r = a0[1];
          }
          return r;
-      }
+      } 
    }
    return r;
 }
@@ -1286,7 +1296,7 @@ function vector_char(x,y,c) {
    var w = simplexFont[off++];
    var l = [];
    var segs = [];
-
+   
    for(var i=0; i<n; i++) {
       var xp = simplexFont[off+i*2];
       var yp = simplexFont[off+i*2+1];
@@ -1295,7 +1305,7 @@ function vector_char(x,y,c) {
       } else {
          l.push([xp+x,yp+y]);
       }
-   }
+   }                
    if(l.length) segs.push(l);
    return { width: w, segments: segs };
 }
@@ -1894,182 +1904,52 @@ var simplexFont = [
 
 // --------------------------------------------------------------------------------------------
 
-function parseAMF(amf,fn) {      // http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format
-   var xml, err = '';            // http://api.jquery.com/category/traversing/
-   try {
-      xml = $.parseXML(amf);
-   } catch(e) {
-      echo("XML parsing error:",e.message.substring(0,120)+"..");
-      err += "XML parsing error / invalid XML";
-   }
-   var v = [];    // vertices
-   var f = [];    // faces
-   //var c = [];    // color settings (per face)
-   var nv = 0, np = 0;
-   var src = '', srci = '';
-
-   srci = "\tvar pgs = [];\n";
-
-   var meta = [];
-   var metatag = $(xml).find('metadata');    // -- extract metadata
-   metatag.each(function() {
-      var el = $(this);
-      meta[el.attr('type')] = el.text();
-   });
-
-   var obj = $(xml).find('object');
-   obj.each(function() {
-      var el = $(this);
-      var mesh = el.find('mesh');
-      mesh.each(function() {
-         var el = $(this);
-         var c = [];
-         var co = el.find('color');
-         var rgbm = [];
-         if(co.length) {
-            rgbm = [co.find('r').first().text(), co.find('g').first().text(), co.find('b').first().text()];
-            if(co.find('a').length) rgbm = rgbm.concat(co.find('a').first().text());
-         }
-         v = []; f = []; nv = 0;        // we create each individual polygon
-
-         var vertices = el.find('vertices');
-         var sn = nv;
-         vertices.each(function() {
-            var el = $(this);
-            var vertex = el.find('vertex');
-            vertex.each(function() {
-               var el = $(this);
-               var x = el.find('x').text();
-               var y = el.find('y').text();
-               var z = el.find('z').text();
-               v.push([x,y,z]);
-               nv++;
-            });
-         });
-         var volume = el.find('volume');
-         volume.each(function() {
-            var el = $(this);
-            var rgbv = [], co = el.find('color');
-            if(co.length) {
-               rgbv = [co.find('r').first().text(), co.find('g').first().text(), co.find('b').first().text()];
-               if(co.find('a').length) rgbv = rgbv.concat(co.find('a').first().text());
-            }
-            var triangle = el.find('triangle');
-            triangle.each(function() {
-               var el = $(this);
-               var rgbt = [], co = el.find('color');
-               if(co.length) {
-                  rgbt = [co.find('r').first().text(), co.find('g').first().text(), co.find('b').first().text()];
-                  if(co.find('a').length) rgbt = rgbt.concat(co.find('a').first().text());
-               }
-               var v1 = parseInt(el.find('v1').first().text()); // -- why: v1 might occur <v1>1</v1><map><v1>0</v1></map> -> find('v1') return '1'+'0' = '10'
-               var v2 = parseInt(el.find('v2').first().text());
-               var v3 = parseInt(el.find('v3').first().text());
-               if(rgbm.length||rgbv.length||rgbt.length)
-                  c[f.length] = rgbt.length?rgbt:(rgbv.length?rgbv:rgbm);
-               f.push([v1+sn,v2+sn,v3+sn]);        // HINT: reverse order for polyhedron()
-
-               var maps = el.find('map');
-               maps.each(function() {
-                  ;        // not yet
-               });
-            });
-         });
-         var textures = el.find('texture');
-         textures.each(function() {
-            ; // not yet
-         });
-
-         // v[] has the vertices
-         // f[] has the faces
-         for(var i=0; i<f.length; i++) {
-            //srci += "\tpgs.push(new CSG.Polygon([\n\t\t";
-            srci += "\tpgs.push(PP([\n\t\t";
-            for(var j=0; j<f[i].length; j++) {
-               if(f[i][j]<0||f[i][j]>=v.length) {
-                  if(err.length=='') err += "bad index for vertice (out of range)";
-                  continue;
-               }
-               if(j) srci += ",\n\t\t";
-               //srci += "<!-- "+v+","+f+" -->";
-               //srci += "<!-- "+f[i]+":"+v.length+":"+v[f[i]]+" -->";
-               //srci += "new CSG.Vertex(new CSG.Vector3D("+v[f[i][j]]+"))";
-               srci += "VV("+v[f[i][j]]+")";
-            }
-            srci += "])";
-            if(c[i]) srci += ".setColor("+c[i]+")";
-            srci += ");\n";
-            np++;
-         }
-      });
-   });
-   var src = "";
-   for(var k in meta) {
-      src += "// AMF."+k+": "+meta[k]+"\n";
-   }
-   src += "// producer: OpenJSCAD Compatibility ("+version().join('.')+") AMF Importer\n";
-   src += "// date: "+(new Date())+"\n";
-   src += "// source: "+fn+"\n";
-   src += "\n";
-
-   if(err) src += "// WARNING: import errors: "+err+" (some triangles might be misaligned or missing)\n";
-   src += "// objects: 1\n// object #1: polygons: "+np+"\n\n";
-   src += "function main() {\n";
-   src += "\tvar PP = function(a) { return new CSG.Polygon(a); }\n";
-   src += "\tvar VV = function(x,y,z) { return new CSG.Vertex(new CSG.Vector3D(x,y,z)); }\n";
-   //src += vt2jscad(v,f,[],c);
-   src += srci;
-   src += "\treturn CSG.fromPolygons(pgs);\n}\n";
-   return src;
-}
-
-
 function parseOBJ(obj,fn) {   // http://en.wikipedia.org/wiki/Wavefront_.obj_file
    var l = obj.split(/\n/);
    var v = [], f = [];
-
+   
    for(var i=0; i<l.length; i++) {
       var s = l[i];
       var a = s.split(/\s+/);
 
       if(a[0]=='v') {
          v.push([a[1],a[2],a[3]]);
-
+         
       } else if(a[0]=='f') {
          var fc = [];
          var skip = 0;
 
          for(var j=1; j<a.length; j++) {
-            var c = a[j];
+            var c = a[j];            
             c = c.replace(/\/.*$/,'');     // -- if coord# is '840/840' -> 840
             c--;                       // -- starts with 1, but we start with 0
-            if(c>=v.length)
+            if(c>=v.length) 
                skip++;
             if(skip==0)
                fc.push(c);
          }
          //fc.reverse();
-         if(skip==0)
+         if(skip==0) 
             f.push(fc);
-
+         
       } else {
          ;     // vn vt and all others disregarded
       }
    }
-   var src = "";
+   var src = ""; 
    src += "// producer: OpenJSCAD Compatibility ("+version().join('.')+") Wavefront OBJ Importer\n";
    src += "// date: "+(new Date())+"\n";
    src += "// source: "+fn+"\n";
    src += "\n";
    //if(err) src += "// WARNING: import errors: "+err+" (some triangles might be misaligned or missing)\n";
    src += "// objects: 1\n// object #1: polygons: "+f.length+"\n\n";
-   src += "function main() { return ";
+   src += "function main() { return "; 
    src += vt2jscad(v,f);
    src += "; }";
    return src;
 }
 
-// STL function from http://jsfiddle.net/Riham/yzvGD/35/
+// STL function from http://jsfiddle.net/Riham/yzvGD/35/ 
 // CC BY-SA by Riham
 // changes by Rene K. Mueller <spiritdude@gmail.com>
 //
@@ -2101,15 +1981,55 @@ function parseBinarySTL(stl,fn) {
     var vertices = [];
     var triangles = [];
     var normals = [];
+    var colors = [];
     var vertexIndex = 0;
     var converted = 0;
     var err = 0;
+    var mcolor = null;
+    var umask = parseInt('01000000000000000',2);
+    var rmask = parseInt('00000000000011111',2);
+    var gmask = parseInt('00000001111100000',2);
+    var bmask = parseInt('00111110000000000',2);
     var br = new BinaryReader(stl);
 
-    br.seek(80); //Skip header
-    //for(var i=0; i<80; i++)
-    //   br.readInt8();
-
+    var m=0,c=0,r=0,g=0,b=0,a=0;
+    for(var i=0; i<80; i++) {
+        switch (m) {
+        case 6:
+            r = br.readUInt8();
+            m +=1;
+            continue;
+        case 7:
+            g = br.readUInt8();
+            m +=1;
+        continue;
+             case 8:
+            b = br.readUInt8();
+            m +=1;
+            continue;
+        case 9:
+            a = br.readUInt8();
+            m +=1;
+            continue;
+        default:
+            c = br.readChar();
+            switch (c) {
+            case 'C':
+            case 'O':
+            case 'L':
+            case 'R':
+            case '=':
+                m += 1;
+            default:
+                break;
+            }
+            break;
+        }
+    }
+    if (m == 10) { // create the default color
+        mcolor = [r/255,g/255,b/255,a/255];
+    }
+      
     var totalTriangles = br.readUInt32(); //Read # triangles
 
     for (var tr = 0; tr < totalTriangles; tr++) {
@@ -2144,7 +2064,21 @@ function parseBinarySTL(stl,fn) {
         // -- every 3 vertices create a triangle.
         var triangle = []; triangle.push(vertexIndex++); triangle.push(vertexIndex++); triangle.push(vertexIndex++);
 
-        br.readUInt16();
+        var abc = br.readUInt16();
+        var color = null;
+        if (m == 10) {
+          var u = (abc & umask); // 0 if color is unique for this triangle
+          var r = (abc & rmask) / 31;
+          var g = ((abc & gmask) >>> 5) / 31;
+          var b = ((abc & bmask) >>> 10) / 31;
+          var a = 255;
+          if (u == 0) {
+            color = [r,g,b,a];
+          } else {
+            color = mcolor;
+          }
+          colors.push(color);
+        }
 
         // -- Add 3 vertices for every triangle
         // -- TODO: OPTIMIZE: Check if the vertex is already in the array, if it is just reuse the index
@@ -2159,7 +2093,7 @@ function parseBinarySTL(stl,fn) {
            var e1 = w2.minus(w1);
            var e2 = w3.minus(w1);
            var t = new CSG.Vector3D(no).dot(e1.cross(e2));
-           if(t>0) {    // 1,2,3 -> 3,2,1
+           if(t>0) {    // 1,2,3 -> 3,2,1 
               var tmp = v3;
               v3 = v1;
               v1 = tmp;
@@ -2179,8 +2113,8 @@ function parseBinarySTL(stl,fn) {
    src += "\n";
    if(err) src += "// WARNING: import errors: "+err+" (some triangles might be misaligned or missing)\n";
    src += "// objects: 1\n// object #1: triangles: "+totalTriangles+"\n\n";
-   src += "function main() { return ";
-   src += vt2jscad(vertices,triangles,normals);
+   src += "function main() { return "; 
+   src += vt2jscad(vertices,triangles,normals,colors);
    src += "; }";
    return src;
 }
@@ -2190,25 +2124,25 @@ function parseAsciiSTL(stl,fn) {
    var n = 0;
    var converted = 0;
    var o;
-
+     
    src += "// producer: OpenJSCAD Compatibility ("+version().join('.')+") STL ASCII Importer\n";
    src += "// date: "+(new Date())+"\n";
    src += "// source: "+fn+"\n";
    src += "\n";
-    src += "function main() { return union(\n";
+    src += "function main() { return union(\n"; 
     // -- Find all models
     var objects = stl.split('endsolid');
     src += "// objects: "+(objects.length-1)+"\n";
-
+    
     for (o = 1; o < objects.length; o++) {
-        // -- Translation: a non-greedy regex for facet {...} endloop pattern
+        // -- Translation: a non-greedy regex for facet {...} endloop pattern 
         var patt = /\bfacet[\s\S]*?endloop/mgi;
         var vertices = [];
         var triangles = [];
         var normals = [];
         var vertexIndex = 0;
         var err = 0;
-
+        
         match = stl.match(patt);
         if (match == null) continue;
         for (var i = 0; i < match.length; i++) {
@@ -2307,9 +2241,15 @@ function vt2jscad(v,t,n,c) {     // vertices, triangles, normals and colors
       if(j++) src += ",\n\t";
       src += "["+t[i]+"]"; //.join(', ');
    }
+   if (c && t.length == c.length) {
+     src += "],\n\tcolors: [\n\t";
+     for(var i=0,j=0; i<c.length; i++) {
+        if(j++) src += ",\n\t";
+        src += "["+c[i]+"]"; //.join(', ');
+     }
+   }
    src += "] })\n";
    return src;
-   //return polyhedron({points:vertices, triangles: triangles});
 }
 
 // BinaryReader
@@ -2421,7 +2361,7 @@ BinaryReader.prototype = {
       var sum = (this._readByte(curByte, size) >> offsetRight) & ((1 << (diff ? 8 - offsetRight : length)) - 1);
 
       if (diff && offsetLeft) {
-         sum += (this._readByte(lastByte++, size) & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight;
+         sum += (this._readByte(lastByte++, size) & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight; 
       }
 
       while (diff) {
@@ -2438,15 +2378,15 @@ BinaryReader.prototype = {
    }
 };
 
-function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
-                                  // just as experiment ...
-   var l = gcode.split(/[\n]/);   // for now just GCODE ASCII
+function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code 
+                                  // just as experiment ... 
+   var l = gcode.split(/[\n]/);   // for now just GCODE ASCII 
    var srci = '';
    var d = 0, pos = [], lpos = [], le = 0, ld = 0, p = [];
    var origin = [-100,-100];
    var layers = 0;
    var lh = 0.35, lz = 0;
-
+   
    for(var i=0; i<l.length; i++) {
       var val = '', k, e = 0;
       if(l[i].match(/^\s*;/))
@@ -2458,17 +2398,17 @@ function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
             if(n==1) d++;
             if(n==90) pos.type = 'abs';
             if(n==91) pos.type = 'rel';
-
+            
          } else if(c[j].match(/M(\d+)/)) {
             var n = parseInt(RegExp.$1);
             if(n==104||n==109)
-               k = 'temp';
-
+               k = 'temp'; 
+   
          } else if(c[j].match(/S([\d\.]+)/)) {
             var v = parseInt(RegExp.$1);
-            if(k!==undefined)
+            if(k!==undefined) 
                val[k] = v;
-
+            
          } else if(c[j].match(/([XYZE])([\-\d\.]+)/)) {
             var a = RegExp.$1, v = parseFloat(RegExp.$2);
             if(pos.type=='abs') {
@@ -2477,7 +2417,7 @@ function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
                if(d) pos[a] += v;
             }
             //console.log(d,a,pos.E,lpos.E);
-            if(d&&a=='E'&&lpos.E===undefined)
+            if(d&&a=='E'&&lpos.E===undefined) 
                lpos.E = pos.E;
             if(d&&a=='E'&&(pos.E-lpos.E)>0) {
                //console.log(pos.E,lpos.E);
@@ -2492,19 +2432,19 @@ function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
                p.push("["+(lpos.X+origin[0])+","+(lpos.Y+origin[1])+"]");
             }
             p.push("["+(pos.X+origin[0])+","+(pos.Y+origin[1])+"]");
-         }
+         } 
          if(!e&&le&&p.length>1) {
             if(srci.length) srci += ",\n\t\t";
-            if(pos.Z!=lz) {
+            if(pos.Z!=lz) { 
                lh = pos.Z-lz;
                layers++;
             }
             srci += "EX(["+p.join(', ')+"],{w: "+lh*1.1+", h:"+lh*1.02+", fn:1, closed: false}).translate([0,0,"+pos['Z']+"])";
             p = [];
             lz = pos.Z;
-            //if(layers>2)
+            //if(layers>2) 
             //   break;
-         }
+         } 
          le = e;
          lpos.X = pos.X;
          lpos.Y = pos.Y;
@@ -2513,7 +2453,7 @@ function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
       }
       ld = d;
    }
-
+   
    var src = "";
    src += "// producer: OpenJSCAD Compatibility ("+version().join('.')+") GCode Importer\n";
    src += "// date: "+(new Date())+"\n";
@@ -2521,7 +2461,7 @@ function parseGCode(gcode,fn) {   // http://reprap.org/wiki/G-code
    src += "\n";
    //if(err) src += "// WARNING: import errors: "+err+" (some triangles might be misaligned or missing)\n";
    src += "// layers: "+layers+"\n";
-   src += "function main() {\n\tvar EX = function(p,opt) { return rectangular_extrude(p,opt); }\n\treturn [";
+   src += "function main() {\n\tvar EX = function(p,opt) { return rectangular_extrude(p,opt); }\n\treturn ["; 
    src += srci;
    src += "\n\t];\n}\n";
    return src;
@@ -2537,7 +2477,7 @@ function clone(obj) {
     }
     return copy;
 }
-
+   
 /**
 sprintf() for JavaScript 0.7-beta1
 http://www.diveintojavascript.com/projects/javascript-sprintf
@@ -2747,7 +2687,7 @@ _getParameterDefinitions = function(param) {         // used for openjscad CLI o
          }
       }
       return p;
-   } else
+   } else 
       return param;
 }
 
@@ -2757,18 +2697,17 @@ if(typeof module !== 'undefined') {    // we are used as module in nodejs requir
    var CSG = require(global.lib+'./csg.js').CSG;
    //console.log("lib="+global.lib);
 
-  module.exports = {
+  module.exports = { 
     // -- list all functions we export
     version: version,
     parseSTL: parseSTL,
-    parseAMF: parseAMF,
     parseOBJ: parseOBJ,
     parseGCode: parseGCode,
-    color:color, group:group, union:union,
-    difference:difference,
+    color:color, group:group, union:union, 
+    difference:difference, 
     intersection:intersection,
     simplexFont: simplexFont,
-    vector_text: vector_text,
+    vector_text: vector_text, 
     vector_char: vector_char,
     hsv2rgb: hsv2rgb, rgb2hsv: rgb2hsv,
     hsl2rgb: hsl2rgb, rgb2hsl: rgb2hsl,
@@ -2780,7 +2719,7 @@ if(typeof module !== 'undefined') {    // we are used as module in nodejs requir
     abs:abs, min:min, max:max, tan:tan,
     acos:acos, cos:cos, asin:asin, sin:sin,
     triangle:triangle, polygon:polygon, circle:circle,
-    square:square,
+    square:square, 
     rectangular_extrude:rectangular_extrude,
     rotate_extrude: rotate_extrude,
     linear_extrude:linear_extrude,
@@ -2790,8 +2729,10 @@ if(typeof module !== 'undefined') {    // we are used as module in nodejs requir
     expand:expand, contract:contract, mirror:mirror,
     rotate:rotate, scale:scale, center:center,
     translate:translate, polyhedron:polyhedron,
-    torus:torus, cylinder:cylinder,
+    torus:torus, cylinder:cylinder, 
     geodesicSphere: geodesicSphere, sphere: sphere,
-    cube:cube
+    cube:cube 
   };
 }
+
+

@@ -1,0 +1,19 @@
+--- openjscad/formats.js	2017-01-14 14:00:00.000000000 -0600
++++ openjscad/formats-fix.js	2017-01-14 14:02:21.000000000 -0600
+@@ -22,11 +22,11 @@
+
+ // import the required modules if necessary
+
+-if(typeof module !== 'undefined') {    // used via nodejs
+-    CSG = require(lib+'csg.js').CSG;
+-    CAG = require(lib+'csg.js').CAG;
+-    Blob = require(lib+'Blob.js').Blob;
+-}
++// if(typeof module !== 'undefined') {    // used via nodejs
++//     CSG = require(lib+'csg.js').CSG;
++//     CAG = require(lib+'csg.js').CAG;
++//     Blob = require(lib+'Blob.js').Blob;
++// }
+
+ ////////////////////////////////////////////
+ // X3D Export

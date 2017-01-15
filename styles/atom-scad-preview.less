@@ -5,38 +5,103 @@
 @import "ui-variables";
 
 .atom-scad-preview {
+  display: flex;
+  flex-direction: column;
+
+  .atom-scad-preview-viewer {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .viewer {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
+
+  .viewer canvas {
+    position: relative;
+  }
+
+  .parametersdiv {}
+
+  .parameterstable {}
+
+  div.topstatus {
+    display: flex;
+    flex-direction: row;
+    padding: 1em;
+    align-items: center;
+    align-content: space-between;
+  }
+
   .statusdiv {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    z-index: 1;
   }
-  .parametersdiv {
+
+  .hidden {
+    display: none;
+  }
+
+  div.parameterstable table {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: space-between;
+  }
+
+  div.parameterstable table tr {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+  }
+
+  div.parameterstable table td,
+  div.parameterstable table th {}
+
+  div.versiondiv {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background: rgba(192,192,192,.5);
-    padding: 5px;
-    border-radius: 5px;
-
-    button {
-      float: right;
-    }
+    z-index: 1;
+    right: 0;
+    top: 0;
   }
-  .parameterstable {
-    min-width: 200px;
-    max-height: 100px;
+
+  div.logging-overlay {
+    position: absolute;
+    z-index: 1;
+    top: 2em;
+    max-width: 60%;
+    max-height: 50%;
+  }
+
+  div.errordiv {
     overflow: auto;
-    display: block;
-
-    margin: .5em 0;
-
-    td {
-      padding-right: 1em;
-    }
   }
-}
 
-.statusdiv {
-  padding: 1em;
+  div.logdiv {
+    min-height: 2em;
+    max-height: 20em;
+    overflow: scroll;
+    font-family: Hack, monospace;
+  }
+
+  div.logdiv div.log-line.log-debug {
+    color: limegreen;
+  }
+  div.logdiv div.log-line.log-info,
+  div.logdiv div.log-line.log-log {
+    color: white;
+  }
+  div.logdiv div.log-line.log-warn {
+    color: orange;
+  }
+  div.logdiv div.log-line.log-error {
+    color: blue;
+  }
+  span.arg-object {
+    white-space: pre-wrap;
+  }
 }
