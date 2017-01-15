@@ -1,21 +1,24 @@
-function parseColor (color) {
-  // hsl, hsv, rgba, and #xxyyzz is supported
-  var rx = {
-    'html': /^#(?:([a-f0-9]{3})|([a-f0-9]{6}))$/i,
-    'fn': /^(rgb|hsl|hsv)a?\s*\(([^\)]+)\)$/i,
-  };
-  var rgba;
-  var match;
-  if (match = color.match (rx.html)) {
-    rgba = [parseInt (match[1], 16), parseInt (match[2], 16), parseInt (match[3], 16), 1];
-  } else if (match = color.match (rx.fn)) {
-    rgba = [match[1], match[2], match[3], match[4]];
-  }
+/*global OpenJsCad */
+/*eslint no-console: 0*/
 
-  console.log (match);
-
-  return rgba;
-}
+// function parseColor(color) {
+//   // hsl, hsv, rgba, and #xxyyzz is supported
+//   var rx = {
+//     'html': /^#(?:([a-f0-9]{3})|([a-f0-9]{6}))$/i,
+//     'fn': /^(rgb|hsl|hsv)a?\s*\(([^\)]+)\)$/i,
+//   };
+//   var rgba;
+//   var match;
+//   if (match = color.match(rx.html)) {
+//     rgba = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16), 1];
+//   } else if (match = color.match(rx.fn)) {
+//     rgba = [match[1], match[2], match[3], match[4]];
+//   }
+//
+//   console.log(match);
+//
+//   return rgba;
+// }
 
 /**
  * Merge deep two objects, simplified version for config
@@ -23,15 +26,15 @@ function parseColor (color) {
  * @param   {object} src source object
  * @returns {object} modified destination object
  */
-function deepMerge (dst, patch) {
+function deepMerge(dst, patch) {
   for (var key in patch) {
     // special check for color strings, we'll parse those strings and put into rgba object
     if (
-      patch[key] !== undefined && patch[key].constructor && patch[key].constructor === String
-      && dst[key] !== undefined && patch[key].constructor && patch[key].constructor === Object
-      && 'r' in dst[key] && 'g' in dst[key] && 'b' in dst[key]
+      patch[key] !== undefined && patch[key].constructor && patch[key].constructor === String &&
+      dst[key] !== undefined && patch[key].constructor && patch[key].constructor === Object &&
+      'r' in dst[key] && 'g' in dst[key] && 'b' in dst[key]
     ) {
-
+      // ok
     } else if (patch[key] !== undefined && patch[key].constructor && patch[key].constructor === Object) {
       dst[key] = dst[key] || {};
       arguments.callee(dst[key], patch[key]);
@@ -47,7 +50,7 @@ function deepMerge (dst, patch) {
  * @param {object} options modern options object
  * @param {object} custom  legacy options object
  */
-function applyLegacyOptions (options, custom) {
+function applyLegacyOptions(options, custom) {
   if ('drawLines' in custom) {
     options.solid.lines = custom.drawLines;
   }
@@ -79,13 +82,15 @@ function applyLegacyOptions (options, custom) {
  * @param {object}     size             viewer size
  * @param {object}     options          options for renderer
  */
-OpenJsCad.Viewer = function(containerelement, size, customization) {
+OpenJsCad.Viewer = function (containerelement, size, customization) {
   // see the various methods below on how to change these
   var options = OpenJsCad.Viewer.defaults();
+  // console.log('Viewer', this, containerelement, size, customization);
 
-  deepMerge (options, customization || {});
 
-  applyLegacyOptions (options, customization || {});
+  deepMerge(options, customization || {});
+
+  applyLegacyOptions(options, customization || {});
 
   var engine;
 
@@ -96,11 +101,11 @@ OpenJsCad.Viewer = function(containerelement, size, customization) {
 
   // get one of two exising
   if (!engine) {
-    engine = OpenJsCad.Viewer.LightGLEngine || OpenJsCad.Viewer.ThreeEngine
+    engine = OpenJsCad.Viewer.LightGLEngine || OpenJsCad.Viewer.ThreeEngine;
   }
 
   if (!engine) {
-    throw new Error ('Cannot find drawing engine, please define one via "engine" option');
+    throw new Error('Cannot find drawing engine, please define one via "engine" option');
   }
 
   // mixin methods
@@ -109,56 +114,34 @@ OpenJsCad.Viewer = function(containerelement, size, customization) {
       engine.prototype[method] = OpenJsCad.Viewer.prototype[method];
     }
   }
-
-  var e = new engine (containerelement, size, options);
+  // console.log('engine', containerelement, size, options);
+  var e = new engine(containerelement, size, options);
+  // console.log('viewer', containerelement, containerelement.clientWidth, containerelement.clientHeight);
   e.init();
   return e;
 
-}
+};
 
 OpenJsCad.Viewer.prototype = {
-  parseSizeParams: function() {
-    // essentially, allow all relative + px. Not cm and such.
-    var winResizeUnits = ['%', 'vh', 'vw', 'vmax', 'vmin'];
-    var width, height;
-    if (!this.size.width) {
-      this.size.width = this.size.widthDefault;
-    }
-    if (!this.size.height) {
-      this.size.height = this.size.heightDefault;
-    }
-    var wUnit = this.size.width.match(/^(\d+(?:\.\d+)?)(.*)$/)[2];
-    var hUnit = typeof this.size.height == 'string' ?
-        this.size.height.match(/^(\d+(?:\.\d+)?)(.*)$/)[2] :
-    '';
-    // whether unit scales on win resize
-    var isDynUnit = winResizeUnits.indexOf(wUnit) != -1 ||
-        winResizeUnits.indexOf(hUnit) != -1;
-    // e.g if units are %, need to keep resizing canvas with dom
-    if (isDynUnit) {
-      window.addEventListener('resize', this.handleResize.bind(this))
-    }
+  parseSizeParams: function () {
+    // window.addEventListener('resize', this.handleResize.bind(this));
   },
-  resizeCanvas: function (canvas) {
-    var hIsRatio = typeof this.size.height != 'string';
-
-    // apply css, then check px size. This is in case css is not in px
-    canvas.style.width = this.size.width;
-    if (!hIsRatio) {
-      canvas.style.height = this.size.height;
-    }
-
-    var widthInPx = canvas.clientWidth;
-    var heightInPx = hIsRatio
-    ? widthInPx * this.size.height
-    : canvas.clientHeight;  // size.height.match(/^(\d+(?:\.\d+)?)(.*)$/)[1];
-
+  resizeCanvas: function (canvas, callback) {
+    var container = this.containerEl;
+    var w = container.clientWidth;
+    var h = container.clientHeight;
+    // set style and element width/height different if
+    // the devicePixelRatio is not 1.  See https://www.khronos.org/webgl/wiki/HandlingHighDPI
     var devicePixelRatio = window.devicePixelRatio || 1;
-    canvas.width = widthInPx * devicePixelRatio;
-    canvas.height = heightInPx * devicePixelRatio;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = w * devicePixelRatio;
+    canvas.height = h * devicePixelRatio;
+    // console.warn('openjscad.viewer.resizeCanvas', canvas.style.width, canvas.style.height);
+    if (callback) callback();
   },
 
-  setCameraOptions: function(options) {
+  setCameraOptions: function (options) {
     options = options || {};
     // apply all options found
     for (var x in this.options.camera) {
@@ -166,7 +149,7 @@ OpenJsCad.Viewer.prototype = {
     }
   },
 
-  setGridOptions: function(options) {
+  setGridOptions: function (options) {
     options = options || {};
     // apply all options found
     for (var x in this.options.grid) {
@@ -174,7 +157,7 @@ OpenJsCad.Viewer.prototype = {
     }
   },
 
-  setAxesOptions: function(options) {
+  setAxesOptions: function (options) {
     options = options || {};
     // apply all options found
     for (var x in this.options.axes) {
@@ -182,7 +165,7 @@ OpenJsCad.Viewer.prototype = {
     }
   },
 
-  setSolidOptions: function(options) {
+  setSolidOptions: function (options) {
     options = options || {};
     // apply all options found
     for (var x in this.options.solid) {
@@ -198,51 +181,117 @@ OpenJsCad.Viewer.prototype = {
 OpenJsCad.Viewer.defaults = function () {
   return {
     camera: {
-      fov: 45,                           // field of view
-      angle:    {x: -60,y:  0,z:  -45},  // view angle about XYZ axis
-      position: {x:   0,y:  0,z:  100},  // initial position at XYZ
-      clip:     {min: 0.5,  max: 1000},  // rendering outside this range is clipped
+      fov: 45, // field of view
+      angle: {
+        x: -60,
+        y: 0,
+        z: -45
+      }, // view angle about XYZ axis
+      position: {
+        x: 0,
+        y: 0,
+        z: 100
+      }, // initial position at XYZ
+      clip: {
+        min: 0.5,
+        max: 1000
+      }, // rendering outside this range is clipped
     },
     grid: {
-      draw: true,                // draw or not
-      size: 200,                 // plate size (X and Y)
+      draw: true, // draw or not
+      size: 200, // plate size (X and Y)
       // minor grid settings
       m: {
-        i:  1, // number of units between minor grid lines
-        color: {r: .8, g: .8, b: .8, a: .5}, // color
+        i: 1, // number of units between minor grid lines
+        color: {
+          r: .8,
+          g: .8,
+          b: .8,
+          a: .5
+        }, // color
       },
       // major grid settings
       M: {
         i: 10, // number of units between major grid lines
-        color: {r: .5, g: .5, b: .5, a: .5}, // color
+        color: {
+          r: .5,
+          g: .5,
+          b: .5,
+          a: .5
+        }, // color
       },
     },
     axes: {
-      draw: false,                // draw or not
+      draw: false, // draw or not
       x: {
-        neg: {r: 1., g: .5, b: .5, a: .5}, // color in negative direction
-        pos: {r: 1., g:  0, b:  0, a: .8}, // color in positive direction
+        neg: {
+          r: 1.,
+          g: .5,
+          b: .5,
+          a: .5
+        }, // color in negative direction
+        pos: {
+          r: 1.,
+          g: 0,
+          b: 0,
+          a: .8
+        }, // color in positive direction
       },
       y: {
-        neg: {r: .5, g: 1., b: .5, a: .5}, // color in negative direction
-        pos: {r:  0, g: 1., b:  0, a: .8}, // color in positive direction
+        neg: {
+          r: .5,
+          g: 1.,
+          b: .5,
+          a: .5
+        }, // color in negative direction
+        pos: {
+          r: 0,
+          g: 1.,
+          b: 0,
+          a: .8
+        }, // color in positive direction
       },
       z: {
-        neg: {r: .5, g: .5, b: 1., a: .5}, // color in negative direction
-        pos: {r:  0, g:  0, b: 1., a: .8}, // color in positive direction
+        neg: {
+          r: .5,
+          g: .5,
+          b: 1.,
+          a: .5
+        }, // color in negative direction
+        pos: {
+          r: 0,
+          g: 0,
+          b: 1.,
+          a: .8
+        }, // color in positive direction
       },
     },
     solid: {
-      draw:    true,              // draw or not
-      lines:   false,             // draw outlines or not
-      faces:   true,
-      overlay: false,             // use overlay when drawing lines or not
-      smooth:  false,             // use smoothing or not
-      faceColor:   {r: .1, g: .7, b: .5, a: 1.},        // default face color
-      lineColor:   {r: .2, g: .2, b: .2, a: .9},        // default line color
+      draw: true, // draw or not
+      lines: false, // draw outlines or not
+      faces: true,
+      overlay: false, // use overlay when drawing lines or not
+      smooth: false, // use smoothing or not
+      faceColor: {
+        r: .1,
+        g: .7,
+        b: .5,
+        a: 1.
+      }, // default face color
+      lineColor: {
+        r: .2,
+        g: .2,
+        b: .2,
+        a: .9
+      }, // default line color
     },
     background: {
-      color: {r: .3, g: .3, b: .3, a: 1.}
+      color: {
+        r: .3,
+        g: .3,
+        b: .3,
+        a: 1.
+      }
     }
   };
 };
