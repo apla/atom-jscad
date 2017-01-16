@@ -7,78 +7,38 @@
 .atom-scad-preview {
   display: flex;
   flex-direction: column;
-  // border: 1px solid blue;
 
   .atom-scad-preview-viewer {
     display: flex;
     flex-direction: column;
     flex: 1;
-    // border: 1px solid green;
-
   }
 
   .viewer {
     display: flex;
     flex-direction: column;
-    // border: 1px solid red;
     flex: 1 1 auto;
   }
 
   .viewer canvas {
     position: relative;
-    // border: 1px solid yellow;
-    // z-index: 0;
-    // height:480px;
   }
 
-  .statusdiv {
-    // border: 1px solid pink;
-    // position: absolute;
-    // top: 0;
-    // left: 0;
-    // width: 100%;
-  }
+  .parametersdiv {}
 
-  .parametersdiv {
-    // border: 1px solid orange;
-    // position: absolute;
-    // bottom: 5px;
-    // right: 5px;
-    // background: rgba(192,192,192,.5);
-    // padding: 5px;
-    // border-radius: 5px;
-    //
-    // button {
-    //   float: right;
-    // }
-  }
-
-  .parameterstable {
-    // border: 1px solid blue;
-    // min-width: 200px;
-    // max-height: 100px;
-    // overflow: auto;
-    // display: block;
-    //
-    // margin: .5em 0;
-    //
-    // td {
-    //   padding-right: 1em;
-    // }
-  }
+  .parameterstable {}
 
   div.topstatus {
     display: flex;
     flex-direction: row;
     padding: 1em;
-    // border: 1px solid red;
     align-items: center;
     align-content: space-between;
   }
 
   .statusdiv {
-    padding: 1em;
-    flex: 1 1 auto;
+    position: absolute;
+    z-index: 1;
   }
 
   .hidden {
@@ -86,7 +46,6 @@
   }
 
   div.parameterstable table {
-    // border: 1px solid green;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -101,41 +60,39 @@
   }
 
   div.parameterstable table td,
-  div.parameterstable table th {
-    // display: block;
-  }
+  div.parameterstable table th {}
 
-  div.status-overlay {
+  div.versiondiv {
     position: absolute;
     z-index: 1;
-    // height: 75%;
-    width: 90%;
-    max-width: 90%;
+    right: 0;
+    top: 0;
+  }
+
+  div.logging-overlay {
+    position: absolute;
+    z-index: 1;
+    top: 2em;
+    max-width: 60%;
     max-height: 50%;
-    // color: green;
-    // border: 1px solid green;
   }
 
   div.errordiv {
-    // position: absolute;
-    // bottom: 0;
-    // border: 1px solid red;
     overflow: auto;
   }
 
   div.logdiv {
-    // position: absolute;
-    // bottom: 0px;
-    // border: 1px solid blue;
     min-height: 2em;
     max-height: 20em;
     overflow: scroll;
+    font-family: Hack, monospace;
   }
 
   div.logdiv div.log-line.log-debug {
-    color: greenyellow;
+    color: limegreen;
   }
-  div.logdiv div.log-line.log-info {
+  div.logdiv div.log-line.log-info,
+  div.logdiv div.log-line.log-log {
     color: white;
   }
   div.logdiv div.log-line.log-warn {
@@ -143,5 +100,8 @@
   }
   div.logdiv div.log-line.log-error {
     color: blue;
+  }
+  span.arg-object {
+    white-space: pre-wrap;
   }
 }

@@ -28,7 +28,6 @@ OpenJsCad.Viewer.ThreeEngine = function (containerEl, size, options) {
   this.perspective = 45; // in degrees
 
   this.options = options;
-  // this.size = size;
 
   // the element to contain the canvas
   this.containerEl = containerEl;
@@ -56,6 +55,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       this.drawGrid();
     }
   },
+
   createCamera: function () {
     // var cameraAngle = this.options.camera.angle;
     var light = new THREE.PointLight();
@@ -67,6 +67,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     camera.up.set(0, 0, 1);
     this.scene_.add(camera);
   },
+
   createControls: function (canvas) {
     // controls. just change this line (and script include) to other threejs controls if desired
     var controls = new THREE.OrbitControls(this.camera_, canvas);
@@ -77,6 +78,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     controls.autoRotateSpeed = 1;
     controls.addEventListener('change', this.render.bind(this));
   },
+
   webGLAvailable: function () {
     try {
       var canvas = document.createElement('canvas');
@@ -88,6 +90,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       return false;
     }
   },
+
   createRenderer: function (bool_noWebGL) {
     var Renderer = this.webGLAvailable() && !bool_noWebGL ?
       THREE.WebGLRenderer : THREE.CanvasRenderer;
@@ -130,6 +133,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       this_.animate();
     }, false);
   },
+
   render: function () {
     // console.trace('render')
     if (!this.pauseRender_) {
@@ -142,6 +146,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       }
     }
   },
+
   animate: function () {
     // reduce fps? replace func with
     // setTimeout( function() {
@@ -150,10 +155,12 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     // this.requestID_ = requestAnimationFrame(this.animate.bind(this));
     this.controls_.update();
   },
+
   cancelAnimate: function () {
     this.pauseRender_ = true;
     cancelAnimationFrame(this.requestID_);
   },
+
   refreshRenderer: function (bool_noWebGL) {
     this.cancelAnimate();
     if (!bool_noWebGL) {
@@ -173,6 +180,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     this.createRenderer(bool_noWebGL);
     this.animate();
   },
+
   drawAxes: function ( /* axLen */ ) {
     var axes = this.options.axes;
     var size = (axes.size || this.options.grid.size) / 2;
@@ -207,6 +215,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       ));
     }, this);
   },
+
   drawGrid: function () {
     var m = this.options.grid.m; // short cut
     var M = this.options.grid.M; // short cut
@@ -237,6 +246,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     var line_M = THREE.LineSegments ? new THREE.LineSegments(g_M, material_M) : new THREE.Line(g_M, material_M, THREE.LinePieces);
     this.scene_.add(line_M);
   },
+
   applyDrawOptions: function () {
     this.getUserMeshes('faces').forEach(function (faceMesh) {
       faceMesh.visible = !!this.options.solid.faces;
@@ -246,6 +256,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     }, this);
     this.render();
   },
+
   setCsg: function (csg) {
     this.clear();
 
@@ -275,10 +286,12 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     resetZoom && this.resetZoom(res.boundLen);
     this.applyDrawOptions();
   },
+
   clear: function () {
     this.scene_.remove.apply(this.scene_, this.getUserMeshes());
   },
   // gets the meshes created by setCsg
+
   getUserMeshes: function (str) {
     return this.scene_.children.filter(function (ch) {
       if (str) {
@@ -288,6 +301,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
       }
     });
   },
+
   resetZoom: function (r) {
     if (!r) {
       // empty object - any default zoom
@@ -300,6 +314,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
     this.camera_.lookAt(this.scene_.position);
     this.camera_.updateProjectionMatrix();
   },
+
   handleResize: function () {
     var canvas = this.canvas;
     var self = this;

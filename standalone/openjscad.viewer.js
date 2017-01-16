@@ -1,25 +1,6 @@
 /*global OpenJsCad */
 /*eslint no-console: 0*/
 
-// function parseColor(color) {
-//   // hsl, hsv, rgba, and #xxyyzz is supported
-//   var rx = {
-//     'html': /^#(?:([a-f0-9]{3})|([a-f0-9]{6}))$/i,
-//     'fn': /^(rgb|hsl|hsv)a?\s*\(([^\)]+)\)$/i,
-//   };
-//   var rgba;
-//   var match;
-//   if (match = color.match(rx.html)) {
-//     rgba = [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16), 1];
-//   } else if (match = color.match(rx.fn)) {
-//     rgba = [match[1], match[2], match[3], match[4]];
-//   }
-//
-//   console.log(match);
-//
-//   return rgba;
-// }
-
 /**
  * Merge deep two objects, simplified version for config
  * @param   {object} dst destionation object
@@ -85,8 +66,6 @@ function applyLegacyOptions(options, custom) {
 OpenJsCad.Viewer = function (containerelement, size, customization) {
   // see the various methods below on how to change these
   var options = OpenJsCad.Viewer.defaults();
-  // console.log('Viewer', this, containerelement, size, customization);
-
 
   deepMerge(options, customization || {});
 
@@ -114,12 +93,10 @@ OpenJsCad.Viewer = function (containerelement, size, customization) {
       engine.prototype[method] = OpenJsCad.Viewer.prototype[method];
     }
   }
-  // console.log('engine', containerelement, size, options);
+
   var e = new engine(containerelement, size, options);
-  // console.log('viewer', containerelement, containerelement.clientWidth, containerelement.clientHeight);
   e.init();
   return e;
-
 };
 
 OpenJsCad.Viewer.prototype = {
@@ -137,7 +114,6 @@ OpenJsCad.Viewer.prototype = {
     canvas.style.height = h + 'px';
     canvas.width = w * devicePixelRatio;
     canvas.height = h * devicePixelRatio;
-    // console.warn('openjscad.viewer.resizeCanvas', canvas.style.width, canvas.style.height);
     if (callback) callback();
   },
 

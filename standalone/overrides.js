@@ -1,16 +1,15 @@
-/*global OpenJsCad */
+/*global OpenJsCad includeJscad importScripts main */
 /*eslint no-console: 0*/
 
-// console.trace('overrides.js');
 
 // parse the jscad script to get the parameter definitions
 /**
- * `getParamDefinitions` is overriden because it attempts to execute the script
- * to turn the scripts `getParamDefinitions` function.  To bypass CSP, the `OpenJsCad.Function`
+ * `getParamDefinitions` is overriden because it attempts to execute the jscad script
+ * and run the scripts `getParamDefinitions` function.  To bypass CSP, the `OpenJsCad.Function`
  * loophole function needs to be used instead of the built-in `Function`.
  * @param  {String} script The `jscad` script to run.
  */
-OpenJsCad.getParamDefinitions = function (script) {
+OpenJsCad.getParamDefinitions = function getParamDefinitions(script) {
   var scriptisvalid = true;
   script += '\nfunction include() {}'; // at least make it not throw an error so early
   var Fn = OpenJsCad.Function || Function;
@@ -20,7 +19,6 @@ OpenJsCad.getParamDefinitions = function (script) {
     //    BUT we can't introduce any new function!!!
     (new Fn(script)());
   } catch (e) {
-    // console.error('getParamDefinitions', e);
     scriptisvalid = false;
   }
   var params = [];
@@ -33,10 +31,13 @@ OpenJsCad.getParamDefinitions = function (script) {
       throw new Error('The getParameterDefinitions() function should return an array with the parameter definitions');
     }
   }
-  // console.warn('getParamDefinitions', params, scriptisvalid);
   return params;
 };
 
+/**
+ * Overwrite the setError method.  This will attempt to fix the lineno
+ * after the jscad script is appended to the worker script.
+ */
 OpenJsCad.Processor.prototype.setError = function setError(message) {
   if (typeof message == 'string') {
     if (message.length > 0) console.error('setError [string]:', message);
@@ -50,8 +51,19 @@ OpenJsCad.Processor.prototype.setError = function setError(message) {
   }
 };
 
+/**
+ * Regular expresion to find a `src` or `href` attribute in the status string.
+ * @type {RegExp}
+ */
 var srcRe = /(?:src|href)=[']([^']*)/;
-OpenJsCad.Processor.prototype.setStatus = function (txt) {
+
+/**
+ * Overwrite the setStatus method.  This searches the status line for
+ * `href` or `src` and sets the path to the full `baseurl` path.
+ * OpenJsCad 5.2 uses a spinning gif for the busy message, this makes
+ * the image work.
+ */
+OpenJsCad.Processor.prototype.setStatus = function setStatus(txt) {
   if (typeof document !== 'undefined' && this.statusdiv) {
     // Look for href or src in txt string
     var href = srcRe.exec(txt);
@@ -67,17 +79,23 @@ OpenJsCad.Processor.prototype.setStatus = function (txt) {
   }
 };
 
+/**
+ * Clear the log buffer
+ */
 OpenJsCad.Processor.prototype.setLogClear = function setLogClear() {
   this.setLogLines = [];
   this.logdiv.innerHTML = '';
 };
 
+/**
+ * Log a message to the log buffer and display it in the `logdiv`.
+ * @param {String} level logging level
+ * @param {Array} args  The arguments of the log call
+ */
 OpenJsCad.Processor.prototype.setLog = function setLog(level, ...args) {
   if (!this.setLogLines) this.setLogLines = [];
   var now = new Date();
-  var elapsed = this.setLogLast ? now - this.setLogLast : 0;
-
-  // console[level](`[${elapsed}]`, ...args);
+  var elapsed = now - this.rebuildStartTime;
 
   if (this.logdiv) {
     this.setLogLines.push({
@@ -86,18 +104,35 @@ OpenJsCad.Processor.prototype.setLog = function setLog(level, ...args) {
       args: args
     });
 
-    if (this.setLogLines.length > 10) this.setLogLines.shift();
+    if (this.setLogLines.length > 100) this.setLogLines.shift();
 
     this.logdiv.innerHTML = this.setLogLines.map(function (line) {
-      return `<div class="log-line log-${line.level}"> ${line.args.map(a => a.map(b => b.toString()).join(' '))}</div>`;
+
+      var argstr = line.args[0].map(function (arg) {
+        var type = typeof arg;
+        var str = arg;
+        if (type == 'object') {
+          str = JSON.stringify(arg, null, 2);
+        }
+        return `<span class="arg-${type}">${str}</span>`;
+      }).join(' ');
+
+      // only include elapsed timing in `debug` logs
+      var timerstr = level == 'debug' ? `<span>[${elapsed}]</span>` : '';
+      return `
+<div class="log-line log-${line.level}">${timerstr}${argstr}</div>`;
     }).join('\n');
 
     this.setLogLast = now;
+    this.logdiv.scrollTop = this.logdiv.scrollHeight - this.logdiv.clientHeight;
   }
 };
 
+/**
+ * Overwrite the `createElements` method.  Creates a new layout and hooks up
+ * all of the events.
+ */
 OpenJsCad.Processor.prototype.createElements = function createElements() {
-  // console.warn('createElements override');
   var that = this; // for event handlers
 
   while (this.containerdiv.children.length > 0) {
@@ -106,14 +141,14 @@ OpenJsCad.Processor.prototype.createElements = function createElements() {
 
   this.containerdiv.innerHTML = `
   <div class="viewer">
-    <div class="status-overlay">
+    <div class="logging-overlay">
       <div class="topstatus">
-        <div class="statusdiv"></div>
-        <div class="versiondiv">version:</div>
       </div>
       <div class="logdiv"></div>
       <div class="errordiv"><pre></pre></div>
     </div>
+    <div class="statusdiv"></div>
+    <div class="versiondiv"></div>
   </div>
   <div class="selectdiv">
     <span>
@@ -150,25 +185,7 @@ OpenJsCad.Processor.prototype.createElements = function createElements() {
 
   this.currentFormat = 'stla';
 
-  // if (false) {
-  //   var i = 0;
-  //
-  //   function getRandomInt(min, max) {
-  //     min = Math.ceil(min);
-  //     max = Math.floor(max);
-  //     return Math.floor(Math.random() * (max - min)) + min;
-  //   }
-  //
-  //   that.setError('test error string');
-  //   var stop = setInterval(function () {
-  //     var k = getRandomInt(0, logger.levels.length);
-  //     logger[logger.levels[k]](i++, 'test', k);
-  //     if (i > 20) {
-  //       clearInterval(stop);
-  //       that.setError(new Error('test error: error object'));
-  //     }
-  //   }, 250);
-  // }
+  this.containerdiv.querySelector('div.versiondiv').innerHTML = `OpenJsCad version: ${OpenJsCad.version}`;
 
   this.abortbutton.onclick = function ( /* e */ ) {
     that.abort();
@@ -197,12 +214,23 @@ OpenJsCad.Processor.prototype.createElements = function createElements() {
   }
 };
 
+/**
+ * Overwrite `rebuildSolidAsync`, the primary rendering method.  This method
+ * provides the primary communcation between the Worker and the Plugin.  The
+ * jscad script is run in the worker while the UI is running in the Plugin.
+ *
+ * Added a new message type `console` to capture log messages and display them
+ * in the Plugin UI.  The `log`, `debug`, `info`, `warn`, and `error` methods on the
+ * console object are wrapped so they call the `messages` callback.
+ */
 OpenJsCad.Processor.prototype.rebuildSolidAsync = function () {
+  this.rebuildStartTime = new Date(); // to show elapsed time with the log.
+
   // console.warn('rebuildSolidAsync overridden');
   var parameters = this.getParamValues();
   var script = this.getFullScript();
 
-  if (!window.Worker) throw new Error("Worker threads are unsupported.");
+  if (!window.Worker) throw new Error('Worker threads are unsupported.');
 
   // create the worker
   var that = this;
@@ -210,15 +238,14 @@ OpenJsCad.Processor.prototype.rebuildSolidAsync = function () {
   that.worker = OpenJsCad.createJscadWorker(this.baseurl + this.filename, script,
     // handle the results
     function (err, objs) {
-      // console.log('rebuildSolidAsync', err, objs)
       that.worker = null;
       if (err) {
         that.setError(err);
-        that.setStatus("Error.");
+        that.setStatus('Error.');
         that.state = 3; // incomplete
       } else {
         that.setCurrentObjects(objs);
-        that.setStatus("Ready.");
+        that.setStatus('Ready.');
         that.state = 2; // complete
       }
       that.enableItems();
@@ -226,10 +253,9 @@ OpenJsCad.Processor.prototype.rebuildSolidAsync = function () {
     function messages(data) {
       var commands = {
         'console': function (data) {
-          // console.log('messages', data, that.setLog);
           that.setLog(data.level, data.args);
         }
-      }
+      };
       commands[data.cmd](data.objects, data.cmd);
     }
   );
@@ -239,11 +265,11 @@ OpenJsCad.Processor.prototype.rebuildSolidAsync = function () {
   }, this);
   // start the worker
   that.worker.postMessage({
-    cmd: "render",
+    cmd: 'render',
     parameters: parameters,
     libraries: libraries
   });
-}
+};
 
 // Create an worker (thread) for processing the JSCAD script into CSG/CAG objects
 //
@@ -255,11 +281,19 @@ OpenJsCad.Processor.prototype.rebuildSolidAsync = function () {
 // The Worker thread (below) executes, and returns the results via another message.
 //   (KIND OF LAME but that keeps the scope of variables and functions clean)
 // Upon receiving the message, the callback routine is called with the results
-//
+
+/**
+ * Overwrite the `createJscadWorker` function.  This is primary rendering method.
+ * The jscad script is injected into the source script for the Worker to process.
+ * @param  {String}   fullurl  The full url path to the script
+ * @param  {String}   script   The jscad script
+ * @param  {Function} callback Primary callback for errors and the script output
+ * @param  {Function}   message  A callback for messages to be sent to the UI
+ * @return {Worker}            The Worker object
+ */
 OpenJsCad.createJscadWorker = function (fullurl, script, callback, message) {
-  var self = this;
-  // console.warn('createJscadWorker overridden', fullurl);
-  // var source = buildJscadWorkerScript(fullurl, script);
+  // var self = this;
+
   var source = `
 onmessage = function(e) {
   include = includeJscad;
@@ -281,7 +315,6 @@ onmessage = function(e) {
   // when the worker finishes
   // - call back the provided function with the results
   w.onmessage = function (e) {
-    // console.log('onmessage', e.type || e, e.data || 'no data');
     if (e.data instanceof Object) {
       var data = e.data;
       var handlers = {
@@ -294,7 +327,6 @@ onmessage = function(e) {
             var objects = data.objects.map(function (o) {
               return lookup[o['class']].fromCompactBinary(o);
             });
-            // console.log('rendered', objects);
             callback(null, objects);
           } else {
             throw new Error('JSCAD Worker: missing \'objects\'');
@@ -307,7 +339,6 @@ onmessage = function(e) {
           callback(data.txt, null);
         },
         console: function () {
-          // console.log('w.onmessage console', data, self);
           message(data);
         }
       };
@@ -324,7 +355,6 @@ onmessage = function(e) {
   // - call back the provided function with the error
   w.onerror = function (e) {
     console.error('w.onerror', e);
-    // var errtxt = "Error in line " + e.lineno + ": " + e.message;
     callback(e, null);
   };
 
@@ -340,12 +370,19 @@ onmessage = function(e) {
 //   data.libraries  - the libraries (full URLs) to import
 //
 // (Note: This function is appended together with the JSCAD script)
-//
+
+/**
+ * This method is injected into the Worker script in `createJscadWorker`.  Only
+ * one message is used: `render`.  Adds the libraries and runs `main()`, the
+ * results are sent to the UI via a `postMessage` call.
+ * @param  {MessageEvent} e message event to the Worker
+ */
 function runJscadWorker(e) {
   var r = {
     cmd: 'error',
     txt: 'try again'
   };
+
   if (e.data instanceof Object) {
     var data = e.data;
     if (data.cmd == 'render') {
@@ -356,7 +393,6 @@ function runJscadWorker(e) {
       // setup the environment
       if (data.libraries && data.libraries.length) {
         data.libraries.map(function (l) {
-          // console.log('runJscadWorker library', l);
           importScripts(l);
         });
       }
@@ -390,17 +426,21 @@ function runJscadWorker(e) {
   postMessage(r);
 }
 
+/**
+ * This method is injected into the Worker script in `createJscadWorker`.  It
+ * saves then overwrites the console methods in `levels`.  The wrapped methods
+ * will use the original method and send a `postMessage` with the level and
+ * arguments for display in the Plugin UI.
+ */
 function wrapLogger() {
-  // console.log('wrapLogger');
   var levels = ['debug', 'info', 'warn', 'error', 'log'];
 
   levels.forEach(function (level) {
-    // console.log('wrapping', level);
     // store the original
     console['_' + level] = console[level];
 
     console[level] = function (...args) {
-      console['_' + level](...args);
+      console['_' + level]('wrapLogger', ...args);
       postMessage({
         cmd: 'console',
         objects: {
@@ -409,9 +449,5 @@ function wrapLogger() {
         }
       });
     };
-
-    // console[level]('test', level);
   });
-
-  // console.trace('console', console);
 }
