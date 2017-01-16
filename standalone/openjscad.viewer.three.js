@@ -133,7 +133,7 @@ OpenJsCad.Viewer.ThreeEngine.prototype = {
   render: function () {
     // console.trace('render')
     if (!this.pauseRender_) {
-
+      if (this.camera_ instanceof THREE.Camera == false) console.warn('Camera is not a THREE.Camera');
       try {
         // console.debug('render', this.camera_);
         this.renderer_.render(this.scene_, this.camera_);

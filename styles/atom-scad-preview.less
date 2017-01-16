@@ -67,8 +67,18 @@
     // }
   }
 
+  div.topstatus {
+    display: flex;
+    flex-direction: row;
+    padding: 1em;
+    // border: 1px solid red;
+    align-items: center;
+    align-content: space-between;
+  }
+
   .statusdiv {
     padding: 1em;
+    flex: 1 1 auto;
   }
 
   .hidden {
@@ -99,8 +109,10 @@
     position: absolute;
     z-index: 1;
     // height: 75%;
+    width: 90%;
     max-width: 90%;
     max-height: 50%;
+    // color: green;
     // border: 1px solid green;
   }
 
@@ -130,6 +142,6 @@
     color: orange;
   }
   div.logdiv div.log-line.log-error {
-    color: red;
+    color: blue;
   }
 }
