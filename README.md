@@ -8,13 +8,18 @@ Experimental package available [here](https://atom.io/packages/atom-scad-preview
 
 ## Install
 
-To install development version
+Install the atom package using preferences or `apm install atom-scad-preview`.
 
-Go to the atom packages location (`~/.atom/packages/`), then
+To install the development package, clone the repo then cd into the directory
+and run `apm install`.
 
-* `git clone https://github.com/apla/atom-scad-preview`
-* `cd atom-scad-preview`
-* `git checkout openjscad-org`
+To update the OpenJsCad files, cd into the `standalone` directory and `./update.sh`.
+
+You can access the console by pressing `opt-cmd-i`.  Changes in the
+`standalone` directory will be shown the next time you open a preview.  `lib` changes
+need atom to reload, which can be done with `ctrl-opt-cmd-l`.  If you start atom
+in dev mode, use the menu View->Developer->Open in dev mode... changes to the
+`styles/atom-scad-preview.less` file are hot re-loaded.
 
 ## WIP
 
