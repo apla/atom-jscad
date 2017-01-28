@@ -64,12 +64,11 @@ OpenJsCad.runMainInWorker = function(mainParameters)
   }
   catch(e)
   {
-    var errtxt = e.toString();
-    if(e.stack)
-    {
-      errtxt += '\nStack trace:\n'+e.stack;
-    }
-    self.postMessage({cmd: 'error', err: errtxt});
+    var errClone = {};
+    var prop = Object.getOwnPropertyNames(e).forEach ((k) => {
+      errClone[k] = e[k];
+    })
+    self.postMessage({cmd: 'error', err: errClone});
   }
 };
 
@@ -838,6 +837,10 @@ OpenJsCad.Processor.prototype = {
         if(err)
         {
           var errtxt = "Error in line "+err.lineno+": "+err.message;
+          if(err.stack)
+          {
+            errtxt += '\nStack trace:\n'+err.stack;
+          }
           that.setError(errtxt, err);
           that.statusspan.innerHTML = "Error.";
         }
