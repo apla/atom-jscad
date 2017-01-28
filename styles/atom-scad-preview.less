@@ -5,6 +5,10 @@
 @import "ui-variables";
 
 .atom-scad-preview {
+
+  user-select: none;
+  -webkit-user-select: none;
+
   .statusdiv {
     position: absolute;
     top: 0;
@@ -33,6 +37,8 @@
 
     td {
       padding-right: 1em;
+      user-select: all;
+      -webkit-user-select: all;
     }
   }
 }
