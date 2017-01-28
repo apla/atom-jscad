@@ -736,6 +736,8 @@ OpenJsCad.Processor.prototype = {
   setJsCad: function(script, filename) {
     if(!filename) filename = "openjscad.jscad";
     filename = filename.replace(/\.jscad$/i, "");
+    var prevParamValues = {};
+    try {prevParamValues = this.getParamValues ()} catch (e) {}
     this.abort();
     this.clearViewer();
     this.paramDefinitions = [];
@@ -746,7 +748,7 @@ OpenJsCad.Processor.prototype = {
     try
     {
       this.paramDefinitions = OpenJsCad.getParamDefinitions(script);
-      this.createParamControls();
+      this.createParamControls(prevParamValues);
     }
     catch(e)
     {
@@ -1038,7 +1040,7 @@ OpenJsCad.Processor.prototype = {
     );
   },
 
-  createParamControls: function() {
+  createParamControls: function(prevParamValues) {
     this.parameterstable.innerHTML = "";
     this.paramControls = [];
     var paramControls = [];
@@ -1061,7 +1063,10 @@ OpenJsCad.Processor.prototype = {
         throw new Error(errorprefix + "Unknown parameter type '"+type+"'");
       }
       var initial;
-      if('initial' in paramdef)
+      if(paramdef.name in prevParamValues) {
+        initial = prevParamValues[paramdef.name];
+      }
+      else if('initial' in paramdef)
       {
         initial = paramdef.initial;
       }

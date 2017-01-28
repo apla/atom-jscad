@@ -19,7 +19,6 @@ Go to the atom packages location (`~/.atom/packages/`), then
 ## WIP
 
  * [ ] Human-centric scad => jscad conversion
- * [ ] Retain parameter state on source save
  * [ ] Port includes support from .org
    * [ ] Allow to include any supported file
    * [ ] Watch includes for changes and reload
@@ -29,6 +28,10 @@ Go to the atom packages location (`~/.atom/packages/`), then
    * [ ] processor
 
 ## CHANGELOG
+
+v0.7.0
+
+ * [x] Retain parameter state on source save (also ported to [OpenJSCad.org#223](https://github.com/Spiritdude/OpenJSCAD.org/pull/223))
 
 v0.6.1
 
