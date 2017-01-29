@@ -31,6 +31,7 @@ Go to the atom packages location (`~/.atom/packages/`), then
 
 v0.7.0
 
+ * [x] Watch jscad file for changes and render
  * [x] Retain parameter state on source save (also ported to [OpenJSCad.org#223](https://github.com/Spiritdude/OpenJSCAD.org/pull/223))
  * [x] Properly handle tab switch
 
