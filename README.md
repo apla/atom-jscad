@@ -24,7 +24,7 @@ Go to the atom packages location (`~/.atom/packages/`), then
    * [ ] Watch includes for changes and reload
    * [ ] Jump to the error source in included file
  * [ ] **EPIC** merge joostn and Spiritdude histories
-   * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), [#156](https://github.com/Spiritdude/OpenJSCAD.org/pull/156))
+   * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), ~~[#202](https://github.com/Spiritdude/OpenJSCAD.org/pull/202)~~)
    * [ ] processor
 
 ## CHANGELOG
@@ -32,6 +32,7 @@ Go to the atom packages location (`~/.atom/packages/`), then
 v0.7.0
 
  * [x] Retain parameter state on source save (also ported to [OpenJSCad.org#223](https://github.com/Spiritdude/OpenJSCAD.org/pull/223))
+ * [x] Properly handle tab switch
 
 v0.6.1
 

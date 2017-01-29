@@ -139,7 +139,9 @@ OpenJsCad.Viewer.prototype = {
       window.addEventListener('resize', this.handleResize.bind(this))
     }
   },
-  resizeCanvas: function (canvas) {
+  resizeCanvas: function () {
+    var canvas = this.canvas;
+
     var hIsRatio = typeof this.size.height != 'string';
 
     // apply css, then check px size. This is in case css is not in px
