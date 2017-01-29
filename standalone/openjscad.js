@@ -737,7 +737,7 @@ OpenJsCad.Processor.prototype = {
     if(!filename) filename = "openjscad.jscad";
     filename = filename.replace(/\.jscad$/i, "");
     var prevParamValues = {};
-    try {prevParamValues = this.getParamValues ()} catch (e) {}
+    try {prevParamValues = this.getParamValues (/*onlyChanged*/true)} catch (e) {}
     this.abort();
     this.clearViewer();
     this.paramDefinitions = [];
@@ -769,7 +769,7 @@ OpenJsCad.Processor.prototype = {
     }
   },
 
-  getParamValues: function()
+  getParamValues: function(onlyChanged)
   {
     var paramValues = {};
     for(var i = 0; i < this.paramDefinitions.length; i++)
@@ -810,6 +810,15 @@ OpenJsCad.Processor.prototype = {
       {
         value = control.checked;
       }
+
+      if (onlyChanged) {
+        if ('initial' in paramdef && paramdef.initial == value) {
+          continue;
+        } else if ('default' in paramdef && paramdef.default == value) {
+          continue;
+        }
+      }
+
       paramValues[paramdef.name] = value;
     }
     return paramValues;
