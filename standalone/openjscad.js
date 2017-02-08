@@ -267,6 +267,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
       }
       else if(e.data.cmd == "error")
       {
+        e.data.err.workerUrl = blobURL;
         callback(e.data.err, null);
       }
       else if(e.data.cmd == "log")
@@ -276,6 +277,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
     }
   };
   worker.onerror = function(e) {
+    e.workerUrl = blobURL;
     callback(e, null);
   };
   worker.postMessage({
