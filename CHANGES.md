@@ -1,3 +1,8 @@
+v1.0.0
+
+ * [x] Every type of error should be reported to user from now
+ * [x] Written own `include` function, similar to the .org version
+ 
 v0.7.0
 
  * [x] Jump to the error source for blob errors
