@@ -243,7 +243,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   workerscript += "var _csg_libraries=" + JSON.stringify(libraries)+";\n";
   workerscript += "var _csg_baseurl=" + JSON.stringify(baseurl)+";\n";
   workerscript += "var _csg_openjscadurl=" + JSON.stringify(openjscadurl)+";\n";
-  workerscript += "var _csg_makeAbsoluteURL=" + OpenJsCad.makeAbsoluteUrl.toString()+";\n";
+  workerscript += OpenJsCad.makeAbsoluteUrl.toString().replace ('function', 'function _csg_makeAbsoluteURL')+";\n";
   workerscript += "_csg_baselibraries = _csg_baselibraries.map(function(l){return _csg_makeAbsoluteURL(l,_csg_openjscadurl);});\n";
   workerscript += "_csg_libraries = _csg_libraries.map(function(l){return _csg_makeAbsoluteURL(l,_csg_baseurl);});\n";
   workerscript += "_csg_baselibraries.map(function(l){importScripts(l)});\n";
