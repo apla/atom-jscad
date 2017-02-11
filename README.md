@@ -34,6 +34,9 @@ v1.0.0
 
  * [x] Every type of error should be reported to user from now
  * [x] Written own `include` function, similar to the .org version
+ * [x] Fixed infinite loop on previewing second pane
+ * [x] Added full featured sample with descriptions
+ * [x] Package migration
 
 ## License
 
