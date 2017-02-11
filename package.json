@@ -1,7 +1,7 @@
 {
   "name": "atom-jscad",
   "main": "./lib/atom-scad-preview",
-  "version": "0.7.0",
+  "version": "1.0.2",
   "description": "Previewing 3D models inside Atom.",
   "keywords": [
     "scad",

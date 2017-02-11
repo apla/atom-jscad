@@ -1,3 +1,7 @@
+v1.0.1-1.0.2
+
+Technical commits for atom.io
+
 v1.0.0
 
  * [x] Every type of error should be reported to user from now
