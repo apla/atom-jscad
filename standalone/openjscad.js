@@ -728,6 +728,13 @@ OpenJsCad.Processor.prototype = {
   // filename: optional, the name of the .jscad file
   setJsCad: function(script, filename) {
     if(!filename) filename = "openjscad.jscad";
+    var dirname = '';
+    if (filename.lastIndexOf ('/') >= 0) {
+      dirname = filename.substr (0, filename.lastIndexOf ('/'));
+      filename = filename.substr (dirname.length+1);
+      if (!this.options.includesDir)
+        this.options.includesDir = dirname;
+    }
     filename = filename.replace(/\.jscad$/i, "");
     var prevParamValues = {};
     try {prevParamValues = this.getParamValues (/*onlyChanged*/true)} catch (e) {}
@@ -740,7 +747,7 @@ OpenJsCad.Processor.prototype = {
     var scripthaserrors = false;
     try
     {
-      this.paramDefinitions = OpenJsCad.getParamDefinitions(script);
+      this.paramDefinitions = OpenJsCad.getParamDefinitions(script, this.options);
       this.createParamControls(prevParamValues);
     }
     catch(e)
@@ -753,6 +760,7 @@ OpenJsCad.Processor.prototype = {
     {
       this.script = script;
       this.filename = filename;
+      this.dirname  = dirname;
       this.rebuildSolid();
     }
     else
