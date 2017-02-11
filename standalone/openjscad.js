@@ -278,6 +278,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   };
   worker.onerror = function(e) {
     e.workerUrl = blobURL;
+    console.log (e.message, workerscript.split ("\n")[e.lineno - 1]);
     callback(e, null);
   };
   worker.postMessage({
