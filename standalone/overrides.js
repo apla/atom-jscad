@@ -159,8 +159,8 @@ overrides.getParamDefinitions = function getParamDefinitions (script, options) {
     // will throw exception in case of any error
     vm.runInContext (script, sandbox, {
       // filename <string> Specifies the filename used in stack traces produced by this script.
-      // lineOffset <number> Specifies the line number offset that is displayed in stack traces produced by this script.
-      // columnOffset <number> Specifies the column number offset that is displayed in stack traces produced by this script.
+      lineOffset: 1, // <number> Specifies the line number offset that is displayed in stack traces produced by this script.
+      columnOffset: 1, // <number> Specifies the column number offset that is displayed in stack traces produced by this script.
       // displayErrors <boolean> When true, if an Error error occurs while compiling the code, the line of code causing the error is attached to the stack trace.
       // timeout <number> Specifies the number of milliseconds to execute code before terminating execution. If execution is terminated, an Error will be thrown.
     });
