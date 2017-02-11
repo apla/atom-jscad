@@ -35,7 +35,7 @@ OpenJsCad.makeAbsoluteUrl = function(url, baseurl) {
       url = basecomps[0] + '//' + basecomps[2] + '/' + url.replace(re, "");
     }
     else {
-      url = (baseurl.replace(re, "") + '/' + url.replace(re, ""))
+      url = (baseurl + url.replace(re, ""))
         .replace(/[^\/]+\/\.\.\//g, "");
     }
   }
