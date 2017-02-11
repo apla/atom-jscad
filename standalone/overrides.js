@@ -134,7 +134,6 @@ overrides.getParamDefinitions = function getParamDefinitions (script, options) {
    if (typeof process !== "undefined" && process.versions && process.versions.node) {
     // for node we have vm module
     var vm = require ('vm');
-    console.log (options.includesDir);
     var sandbox = {
       _csg_includesdir: options.includesDir + '/',
       _csg_makeAbsoluteURL: OpenJsCad.makeAbsoluteUrl,

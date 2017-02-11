@@ -221,7 +221,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
 
   var baselibraries = OpenJsCad.workerDeps || [ jsDependencies[5], jsDependencies[7]  ];
   // console.log( 'baselibraries', baselibraries );
-  var baseurl = document.location.href.replace(/\?.*$/, '');
+  var baseurl = document.location.href.replace(/\?.*$/, '').replace (/#.*$/, '');
   // var baseurl = 'file:///Users/matias/.atom/packages/atom-scad-preview';
   var openjscadurl = baseurl;
 
