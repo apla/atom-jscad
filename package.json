@@ -1,8 +1,8 @@
 {
-  "name": "atom-scad-preview",
+  "name": "atom-jscad",
   "main": "./lib/atom-scad-preview",
   "version": "0.7.0",
-  "description": "Previewing (j)scad inside Atom.",
+  "description": "Previewing 3D models inside Atom.",
   "keywords": [
     "scad",
     "jscad",
@@ -11,12 +11,12 @@
     "threejs"
   ],
   "activationCommands": {
-    "atom-workspace": "atom-scad-preview:toggle"
+    "atom-workspace": "atom-jscad:preview"
   },
   "scripts": {
     "build-csg-three-js": "pushd standalone && cat three.min.js orbitcontrols.js projector.js canvasrenderer.js csg.js formats.js threecsg.js openjscad.js > openjscad-bundle.js && popd"
   },
-  "repository": "https://github.com/matiasinsaurralde/atom-scad-preview",
+  "repository": "https://github.com/apla/atom-jscad",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"

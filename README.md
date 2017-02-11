@@ -2,9 +2,9 @@
 
 Solid 3D CAD models inside Atom (JSCAD).
 
-![Screenshot](https://raw.githubusercontent.com/apla/atom-scad-preview/master/screenshot.jpg)
+![Screenshot](https://raw.githubusercontent.com/apla/atom-jscad/master/screenshot.jpg)
 
-Package available [here](https://atom.io/packages/atom-scad-preview).
+Package available [here](https://atom.io/packages/atom-jscad).
 
 ## Install
 
@@ -14,8 +14,8 @@ Released version can be installed from [Atom's](http://atom.io)
 To install development version, go to the atom packages location
 (`~/.atom/packages/`), then
 
-* `git clone https://github.com/apla/atom-scad-preview`
-* `cd atom-scad-preview`
+* `git clone https://github.com/apla/atom-jscad`
+* `cd atom-jscad`
 
 ## WIP
 
@@ -37,4 +37,4 @@ v1.0.0
 
 ## License
 
-This is licensed under the [MIT license](https://github.com/apla/atom-scad-preview/blob/master/LICENSE.md).
+This is licensed under the [MIT license](https://github.com/apla/atom-jscad/blob/master/LICENSE.md).

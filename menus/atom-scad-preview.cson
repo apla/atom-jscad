@@ -3,36 +3,40 @@
   'atom-pane[data-active-item-name$=\\.jscad] atom-text-editor': [
     {
       'label': 'Preview JSCAD'
-      'command': 'atom-scad-preview:toggle'
+      'command': 'atom-jscad:preview'
     }
   ]
   'atom-pane[data-active-item-name$=\\.scad] atom-text-editor': [
     {
       'label': 'Preview SCAD'
-      'command': 'atom-scad-preview:toggle'
+      'command': 'atom-jscad:preview'
     }
   ]
   '.tree-view .file .name[data-name$=\\.jscad]': [
     {
       'label': 'Preview JSCAD'
-      'command':  'atom-scad-preview:toggle'
+      'command':  'atom-jscad:preview'
     }
   ]
   '.tree-view .file .name[data-name$=\\.scad]': [
     {
       'label': 'Preview SCAD'
-      'command':  'atom-scad-preview:toggle'
+      'command':  'atom-jscad:preview'
     }
   ]
 'menu': [
   {
     'label': 'Packages'
     'submenu': [
-      'label': 'atom-scad-preview'
+      'label': 'JSCAD'
       'submenu': [
         {
-          'label': 'Toggle'
-          'command': 'atom-scad-preview:toggle'
+          'label': 'Preview'
+          'command': 'atom-jscad:preview'
+        },
+        {
+          'label': 'Paste sample'
+          'command': 'atom-jscad:paste-sample'
         }
       ]
     ]

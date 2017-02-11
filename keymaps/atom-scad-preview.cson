@@ -8,10 +8,7 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 '.platform-darwin atom-workspace atom-text-editor':
-  'cmd-y': 'atom-scad-preview:toggle'
+  'cmd-y': 'atom-jscad:preview'
 
 '.platform-win32 atom-workspace atom-text-editor, .platform-linux atom-workspace atom-text-editor':
-  'ctrl-y': 'atom-scad-preview:toggle'
-
-'.platform-darwin .scad-preview':
-  'cmd-+': 'atom-scad-preview:zoom-in'
+  'ctrl-y': 'atom-jscad:preview'
