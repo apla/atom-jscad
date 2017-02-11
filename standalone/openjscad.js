@@ -192,10 +192,10 @@ OpenJsCad.resultFromCompactBinary = function(resultin) {
 };
 
 
-OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
+OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, options) {
   var workerscript = "";
   workerscript += script;
-  if(debugging)
+  if(options.debugging)
   {
     workerscript += "\n\n\n\n\n\n\n/* -------------------------------------------------------------------------\n";
     workerscript += "OpenJsCad debugging\n\nAssuming you are running Chrome:\nF10 steps over an instruction\nF11 steps into an instruction\n";
@@ -864,7 +864,7 @@ OpenJsCad.Processor.prototype = {
     {
       try
       {
-        var obj = OpenJsCad.parseJsCadScriptSync(this.script, paramValues, this.debugging);
+        var obj = OpenJsCad.parseJsCadScriptSync(this.script, paramValues, Object.assign ({}, this.options, {debugging: this.debugging}));
         that.setRenderedObjects(obj);
         that.processing = false;
         that.statusspan.innerHTML = "Ready.";
