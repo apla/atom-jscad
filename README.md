@@ -1,4 +1,4 @@
-# atom-scad-preview
+# atom-jscad
 
 Solid 3D CAD models inside Atom (JSCAD).
 
@@ -17,8 +17,24 @@ To install development version, go to the atom packages location
 * `git clone https://github.com/apla/atom-jscad`
 * `cd atom-jscad`
 
+## Other projects
+
+ * [OpenJSCAD](http://joostn.github.io/OpenJsCad/)
+
+ This is a base of this package. Project is very outdated, some changes
+ backported from `.org` version, some features added, some things rewritten.
+
+ * [OpenJSCAD.org](http://OpenJSCAD.org/)
+
+ Allows online editing of jscad files, but now in a heavy rewrite stage. Now
+ processing and rendering is almost the same (excluding multiple objects
+ returned from main). Best strategy for `atom-jscad`
+ is use `OpenJSCAD.Processor` and `OpenJSCAD.Viewer` from this project.
+
+
 ## WIP
 
+ * [ ] Add watch for minimum suggestion length in autocomplete-plus configuration
  * [ ] Human-centric scad => jscad conversion
  * [ ] Use processor class from .org
    * [ ] Allow to include any supported file
@@ -29,6 +45,9 @@ To install development version, go to the atom packages location
    * [ ] processor
 
 ## CHANGELOG
+
+v1.1.0
+  * [x] Added completion for some openscad-like helpers
 
 v1.0.0
 
