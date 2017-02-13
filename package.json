@@ -10,7 +10,7 @@
     "cad",
     "threejs"
   ],
-  "activationCommands": {
+  "x-activationCommands": {
     "atom-workspace": "atom-jscad:preview"
   },
   "scripts": {
@@ -20,6 +20,13 @@
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provide"
+      }
+    }
   },
   "dependencies": {
     "loophole": "^1.1.0",

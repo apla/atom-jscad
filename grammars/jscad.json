@@ -1,0 +1,10 @@
+{
+  "filetypes": [
+    "jscad"
+  ],
+  "name": "jscad",
+  "patterns": [{
+    "include": "source.js"
+  }],
+  "scopeName": "source.jscad"
+}
