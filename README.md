@@ -2,7 +2,7 @@
 
 View JSCad files inside Atom.
 
-![Screenshot](screenshot.png)
+![Screenshot](https://github.com/johnwebbcole/atom-jscad-viewer/blob/master/screenshot.png?raw=true)
 
 Forked from [atom-scad-preview](https://atom.io/packages/atom-scad-preview).
 
@@ -38,7 +38,7 @@ function main() {
 Right click on `example.jscad` and select *View JSCAD file*.  A blue cube should appear
 in the right pane.
 
-![Example screenshot](example.png)
+![Example screenshot](https://github.com/johnwebbcole/atom-jscad-viewer/blob/master/example.png?raw=true)
 
 You can use the mouse to rotate and zoom the camera.  Below the viewer, you can export the object as different file types including `.stl` for use in a slicer.
 
