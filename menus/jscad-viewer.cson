@@ -1,0 +1,40 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'context-menu':
+  'atom-pane[data-active-item-name$=\\.jscad] atom-text-editor': [
+    {
+      'label': 'View JSCAD'
+      'command': 'jscad-viewer:toggle'
+    }
+  ]
+  # 'atom-pane[data-active-item-name$=\\.scad] atom-text-editor': [
+  #   {
+  #     'label': 'View SCAD'
+  #     'command': 'jscad-viewer:toggle'
+  #   }
+  # ]
+  '.tree-view .file .name[data-name$=\\.jscad]': [
+    {
+      'label': 'View JSCAD file'
+      'command':  'jscad-viewer:preview-file'
+    }
+  ]
+  # '.tree-view .file .name[data-name$=\\.scad]': [
+  #   {
+  #     'label': 'View SCAD file'
+  #     'command':  'jscad-viewer:preview-file'
+  #   }
+  # ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'JsCad Viewer'
+      'submenu': [
+        {
+          'label': 'Toggle'
+          'command': 'jscad-viewer:toggle'
+        }
+      ]
+    ]
+  }
+]

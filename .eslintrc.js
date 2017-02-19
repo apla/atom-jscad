@@ -9,6 +9,7 @@ module.exports = {
     "atom": true
   },
   "rules": {
+    "no-unused-vars": 0,
     "indent": [
             "error",
             2,

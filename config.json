@@ -17,6 +17,12 @@
 		"type": "boolean",
 		"default": true
 	},
+	"drawAxes": {
+		"title": "Draw axes",
+		"description": "Draw axes",
+		"type": "boolean",
+		"default": false
+	},
 	"color": {
 		"title": "Default model color",
 		"type": "color",

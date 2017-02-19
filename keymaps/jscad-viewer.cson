@@ -8,10 +8,11 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 '.platform-darwin atom-workspace atom-text-editor':
-  'cmd-i': 'atom-scad-preview:toggle'
+  'cmd-i': 'jscad-viewer:toggle'
 
 '.platform-win32 atom-workspace atom-text-editor, .platform-linux atom-workspace atom-text-editor':
-  'ctrl-i': 'atom-scad-preview:toggle'
+  'ctrl-i': 'jscad-viewer:toggle'
 
-'.platform-darwin .scad-preview':
-  'cmd-+': 'atom-scad-preview:zoom-in'
+# '.platform-darwin .jscad-viewer':
+  # 'cmd-+': 'jscad-viewer:zoom-in'
+  # 'cmd--': 'jscad-viewer:zoom-out'

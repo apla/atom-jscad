@@ -1,8 +1,8 @@
 {
-  "name": "atom-scad-preview",
-  "main": "./lib/atom-scad-preview",
-  "version": "0.6.1",
-  "description": "Previewing (j)scad inside Atom.",
+  "name": "jscad-viewer",
+  "main": "./lib/jscad-viewer",
+  "version": "1.0.0",
+  "description": "View jscad files inside Atom.",
   "keywords": [
     "scad",
     "jscad",
@@ -12,17 +12,17 @@
   ],
   "activationCommands": {
     "atom-workspace": [
-      "atom-scad-preview:toggle",
-      "atom-scad-preview:preview-file"
+      "jscad-viewer:toggle",
+      "jscad-viewer:preview-file"
     ]
   },
   "scripts": {
-    "build-csg-three-js": "pushd standalone && cat three.min.js orbitcontrols.js projector.js canvasrenderer.js csg.js formats.js threecsg.js openjscad.js > openjscad-bundle.js && popd"
+    
   },
-  "repository": "https://github.com/matiasinsaurralde/atom-scad-preview",
+  "repository": "https://github.com/johnwebbcole/atom-jscad-viewer",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.0.0 <2.0.0"
+    "atom": ">=1.0.0"
   },
   "dependencies": {
     "async": "^2.1.4",

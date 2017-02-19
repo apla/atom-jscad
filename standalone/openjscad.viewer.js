@@ -32,28 +32,31 @@ function deepMerge(dst, patch) {
  * @param {object} custom  legacy options object
  */
 function applyLegacyOptions(options, custom) {
-  if ('drawLines' in custom) {
-    options.solid.lines = custom.drawLines;
-  }
-  if ('drawFaces' in custom) {
-    options.solid.faces = custom.drawFaces;
-  }
-  if ('color' in custom) {
-    options.solid.faceColor = {
-      r: custom.color[0],
-      g: custom.color[1],
-      b: custom.color[2],
-      a: custom.color[3] || 1,
-    };
-  }
-  if ('bgColor' in custom) {
-    options.background.color = {
-      r: custom.bgColor[0],
-      g: custom.bgColor[1],
-      b: custom.bgColor[2],
-      a: custom.bgColor[3] || 1,
-    };
-  }
+  console.trace('applyLegacyOptions', options, custom);
+  // if ('drawGrid' in custom) options.grid.draw = custom.drawGrid;
+  // 
+  // if ('drawLines' in custom) {
+  //   options.solid.lines = custom.drawLines;
+  // }
+  // if ('drawFaces' in custom) {
+  //   options.solid.faces = custom.drawFaces;
+  // }
+  // if ('color' in custom) {
+  //   options.solid.faceColor = {
+  //     r: custom.color[0],
+  //     g: custom.color[1],
+  //     b: custom.color[2],
+  //     a: custom.color[3] || 1,
+  //   };
+  // }
+  // if ('bgColor' in custom) {
+  //   options.background.color = {
+  //     r: custom.bgColor[0],
+  //     g: custom.bgColor[1],
+  //     b: custom.bgColor[2],
+  //     a: custom.bgColor[3] || 1,
+  //   };
+  // }
 }
 
 /**
@@ -66,11 +69,12 @@ function applyLegacyOptions(options, custom) {
 OpenJsCad.Viewer = function (containerelement, size, customization) {
   // see the various methods below on how to change these
   var options = OpenJsCad.Viewer.defaults();
-
   deepMerge(options, customization || {});
-
-  applyLegacyOptions(options, customization || {});
-
+  // console.log('OpenJsCad.Viewer', options);
+  // 
+  // 
+  // applyLegacyOptions(options, customization || {});
+  // 
   var engine;
 
   // select drawing engine from options
@@ -198,7 +202,7 @@ OpenJsCad.Viewer.defaults = function () {
       },
     },
     axes: {
-      draw: false, // draw or not
+      draw: true, // draw or not
       x: {
         neg: {
           r: 1.,
