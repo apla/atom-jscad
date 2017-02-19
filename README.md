@@ -44,6 +44,10 @@ You can use the mouse to rotate and zoom the camera.  Below the viewer, you can 
 
 ## jscad-utils example
 
+[jscad-utils](https://github.com/johnwebbcole/jscad-utils) is a set of utilities that provide alignment 
+and grouping functions for OpenJsCad.  With it, you can create complex objects quickly
+and easily.
+
 The easiest way to use `jscad-utils` is with the yeoman jscad generator.  It's possible to use the utilites by itself, as detailed in the instructions.  You will need [NodeJS]() and [Gulp]() installed
 
 Follow the instructions to install the generator [here](https://github.com/johnwebbcole/generator-jscad).
