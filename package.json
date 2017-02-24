@@ -31,5 +31,8 @@
   "dependencies": {
     "loophole": "^1.1.0",
     "event-kit": "^2.2.0"
+  },
+  "devDependencies": {
+    "doc-tree": "^0.12.2"
   }
 }

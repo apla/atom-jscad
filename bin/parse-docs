@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+var fs      = require ('fs');
+var docTree = require ('doc-tree');
+
+// Parse a string or a buffer.
+var doc = docTree.parse (fs.readFileSync (__dirname + '/../standalone/openscad.js'));
+
+// An array of parsed comments matched with their contexts.
+var output = doc.output ({render: false});
+
+fs.writeFileSync (__dirname + '/../openscad.json', JSON.stringify (output, null, "\t"));
+
+// Parse a string or a buffer.
+// var doc = docTree.parse (fs.readFileSync (__dirname + '/../standalone/csg.js'));
+var doc = docTree.parse (fs.readFileSync (__dirname + '/../lib/csg.js/csg.js'));
+
+
+// An array of parsed comments matched with their contexts.
+var output = doc.output ({render: false});
+
+fs.writeFileSync (__dirname + '/../csg.json', JSON.stringify (output, null, "\t"));
