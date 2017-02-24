@@ -29,6 +29,8 @@ mimetype: "application/sla",*/
     suffix += '-v' + params.version.match (/([\w\.\-_]+)/)[1];
   }
 
+  var path = require ('path');
+
   var fileName = atom.showSaveDialogSync ({
     defaultPath: path.join (path.dirname (this.filename), path.basename (this.filename, path.extname (this.filename)) + suffix + '.' + formatInfo.extension),
     filters: [
@@ -42,6 +44,8 @@ mimetype: "application/sla",*/
   var fileExt = path.extname (fileName).substr (1);
 
   console.log ("saving into", fileName, fileExt);
+
+  var fs = require ('fs');
 
   var reader = new FileReader();
   reader.addEventListener("loadend", function() {
@@ -100,7 +104,7 @@ overrides.includeJscad = function (fn) {
     url = fn;
   }
   if (typeof importScripts !== "undefined") {
-    self.postMessage({cmd: 'log', txt: 'importing ' + url + '('+fn + '*'+_csg_includesdir+')'});
+    console.log (url + '(' + _csg_includesdir + ', ' + fn + ')');
     if (url[0] === '/') {
       url = 'file://' + url;
     }
@@ -147,7 +151,8 @@ overrides.getParamDefinitions = function getParamDefinitions (script, options) {
         vm.runInContext (c, sandbox);
       },
       params: [],
-      require: require
+      require: require,
+      console: console
     };
 
     vm.createContext(sandbox);
