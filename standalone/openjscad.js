@@ -737,9 +737,12 @@ OpenJsCad.Processor.prototype = {
       if (!this.options.includesDir)
         this.options.includesDir = dirname;
     }
-    filename = filename.replace(/\.jscad$/i, "");
+    // filename = filename.replace(/\.jscad$/i, "");
     var prevParamValues = {};
-    try {prevParamValues = this.getParamValues (/*onlyChanged*/true)} catch (e) {}
+    try {
+      if (!this.hasError)
+        prevParamValues = this.getParamValues (/*onlyChanged*/true);
+    } catch (e) {}
     this.abort();
     this.clearViewer();
     this.paramDefinitions = [];
@@ -750,7 +753,7 @@ OpenJsCad.Processor.prototype = {
     try
     {
       this.paramDefinitions = OpenJsCad.getParamDefinitions(script, this.options);
-      this.createParamControls(prevParamValues);
+      this.createParamControls(prevParamValues || {});
     }
     catch(e)
     {
@@ -843,7 +846,7 @@ OpenJsCad.Processor.prototype = {
 
       if(!useSync)
       {
-      this.worker = OpenJsCad.parseJsCadScriptASync(this.script, paramValues, this.options, function(err, obj) {
+        this.worker = OpenJsCad.parseJsCadScriptASync(this.script, paramValues, this.options, function(err, obj) {
         that.processing = false;
         that.worker && that.worker.terminate();
         that.worker = null;
