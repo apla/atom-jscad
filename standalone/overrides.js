@@ -32,7 +32,7 @@ mimetype: "application/sla",*/
   var path = require ('path');
 
   var fileName = atom.showSaveDialogSync ({
-    defaultPath: path.join (path.dirname (this.filename), path.basename (this.filename, path.extname (this.filename)) + suffix + '.' + formatInfo.extension),
+    defaultPath: path.join (this.dirname || path.dirname (this.filename), path.basename (this.filename, path.extname (this.filename)) + suffix + '.' + formatInfo.extension),
     filters: [
       {name: formatInfo.displayName, extensions: [formatInfo.extension]}
     ]
