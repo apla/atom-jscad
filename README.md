@@ -34,17 +34,20 @@ To install development version, go to the atom packages location
 
 ## WIP
 
+ * [ ] Add option to use touchpad scroll on Mac for panning
  * [ ] Add watch for minimum suggestion length in autocomplete-plus configuration
  * [ ] Human-centric scad => jscad conversion
  * [ ] Use processor class from .org
    * [ ] Allow to include any supported file
-   * [ ] Watch includes for changes and reload
    * [ ] Jump to the error source in included file
  * [ ] **EPIC** merge joostn and Spiritdude histories
    * [ ] viewer ([#82](https://github.com/joostn/OpenJsCad/pull/82), ~~[#202](https://github.com/Spiritdude/OpenJSCAD.org/pull/202)~~)
    * [ ] processor
 
 ## CHANGELOG
+
+v1.2.0
+  * [x] Watch includes for changes and reload
 
 v1.1.0
   * [x] Added completion for some openscad-like helpers

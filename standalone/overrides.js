@@ -111,7 +111,7 @@ overrides.includeJscad = function (fn) {
     importScripts(url);
   } else if (typeof evalFile !== 'undefined') {
     // this is pointless to have urls when processing imports in node
-    evalFile (url);
+    evalFile (url, fn);
   } else {
     var xhr = new XMLHttpRequest();
     xhr.open('GET',url,false);
@@ -131,7 +131,7 @@ overrides.includeJscad = function (fn) {
 overrides.includeJscad.static = true;
 
 // parse the jscad script to get the parameter definitions
-overrides.getParamDefinitions = function getParamDefinitions (script, options) {
+overrides.getParamDefinitions = function getParamDefinitions (script, options, wholeSandbox) {
 
   var params = [];
 
@@ -142,29 +142,47 @@ overrides.getParamDefinitions = function getParamDefinitions (script, options) {
       _csg_includesdir: options.includesDir + '/',
       _csg_makeAbsoluteURL: OpenJsCad.makeAbsoluteUrl,
       // include: includeJscad,
-      evalFile: function (path) {
+      evalFile: function (path, filename) {
+
+        sandbox.includes.push ({path: path, filename: filename});
+
         var fs = require ('fs');
         var c = fs.readFileSync (path);
 
         var vm = require ('vm');
 
-        vm.runInContext (c, sandbox);
+        sandbox.lineOffset += c.toString().split (/\r\n|\r|\n/).length;
+
+        vm.runInContext (c, sandbox, {
+          filename: path,// <string> Specifies the filename used in stack traces produced by this script.
+          lineOffset: sandbox.lineOffset, // <number> Specifies the line number offset that is displayed in stack traces produced by this script.
+          columnOffset: 1, // <number> Specifies the column number offset that is displayed in stack traces produced by this script.
+          // displayErrors <boolean> When true, if an Error error occurs while compiling the code, the line of code causing the error is attached to the stack trace.
+          // timeout <number> Specifies the number of milliseconds to execute code before terminating execution. If execution is terminated, an Error will be thrown.
+        });
       },
       params: [],
+      lineMarker: null,
+      lineOffset: 1,
+      includes: [],
       require: require,
       console: console
     };
 
     vm.createContext(sandbox);
 
-    vm.runInContext (OpenJsCad.includeJscad.toString ().replace ('function', 'function include'), sandbox, {
+    var includeFn = OpenJsCad.includeJscad.toString ().replace ('function', 'function include');
+
+    vm.runInContext (includeFn, sandbox, {
     });
+
+    sandbox.lineOffset += includeFn.split (/\r\n|\r|\n/).length;
 
     // first try to execute the script itself
     // will throw exception in case of any error
     vm.runInContext (script, sandbox, {
       // filename <string> Specifies the filename used in stack traces produced by this script.
-      lineOffset: 1, // <number> Specifies the line number offset that is displayed in stack traces produced by this script.
+      lineOffset: sandbox.lineOffset, // <number> Specifies the line number offset that is displayed in stack traces produced by this script.
       columnOffset: 1, // <number> Specifies the column number offset that is displayed in stack traces produced by this script.
       // displayErrors <boolean> When true, if an Error error occurs while compiling the code, the line of code causing the error is attached to the stack trace.
       // timeout <number> Specifies the number of milliseconds to execute code before terminating execution. If execution is terminated, an Error will be thrown.
@@ -181,6 +199,10 @@ overrides.getParamDefinitions = function getParamDefinitions (script, options) {
   {
     throw new Error("The getParameterDefinitions() function should return an array with the parameter definitions");
   }
+
+  if (wholeSandbox)
+    return sandbox;
+
   return params;
 };
 

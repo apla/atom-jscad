@@ -343,6 +343,15 @@ OpenJsCad.AlertUserOfUncaughtExceptions = function() {
   };
 };
 
+OpenJsCad.splitFilename = function (filename) {
+  var result = {filename: filename};
+  if (filename.lastIndexOf ('/') >= 0) {
+    result.dirname  = filename.substr (0, filename.lastIndexOf ('/'));
+    result.filename = filename.substr (result.dirname.length+1);
+  }
+  return result;
+}
+
 // parse the jscad script to get the parameter definitions
 OpenJsCad.getParamDefinitions = function(script) {
   var Fn = OpenJsCad.Function || Function;
@@ -725,17 +734,16 @@ OpenJsCad.Processor.prototype = {
   setDebugging: function(debugging) {
     this.debugging = debugging;
   },
-
   // script: javascript code
   // filename: optional, the name of the .jscad file
   setJsCad: function(script, filename) {
     if(!filename) filename = "openjscad.jscad";
     var dirname = '';
-    if (filename.lastIndexOf ('/') >= 0) {
-      dirname = filename.substr (0, filename.lastIndexOf ('/'));
-      filename = filename.substr (dirname.length+1);
-      if (!this.options.includesDir)
-        this.options.includesDir = dirname;
+    var filenameParts = OpenJsCad.splitFilename (filename);
+    if (filenameParts.dirname) {
+      this.options.includesDir = filenameParts.dirname;
+      filename = filenameParts.filename;
+      dirname  = filenameParts.dirname;
     }
     // filename = filename.replace(/\.jscad$/i, "");
     var prevParamValues = {};

@@ -1,3 +1,13 @@
+v1.2.0
+  * [x] Watch includes for changes and reload
+
+v1.1.x
+
+Still fighting errors notifications
+
+v1.1.0
+  * [x] Added completion for some openscad-like helpers
+
 v1.0.1-1.0.2
 
 Technical commits for atom.io
